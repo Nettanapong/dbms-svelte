@@ -9,26 +9,23 @@
       <img src="/src/lib/assets/coffee-beans.png" class="h-10" alt="Logo" />
       <span
         class="self-center text-2xl font-bold whitespace-nowrap text-stone-800 hover:text-orange-800"
-        >COFFEE</span
       >
+        COFFEE
+      </span>
     </a>
     <div class="hidden w-full md:block md:w-auto" id="navbar-solid-bg">
       <ul
         class="flex flex-col mt-4 md:space-x-10 rtl:space-x-reverse md:flex-row md:my-0 items-center"
       >
-        <li>
-          <a href="/" class="no-underline"
-            ><span class="h-8 w-8 font-semibold text-stone-800 hover:text-orange-800"
-              >สินค้าทั้งหมด</span
-            ></a
-          >
+        <li class="flex items-center">
+          <a href="/" class="no-underline">
+            <span class="h-8 w-8 font-semibold text-stone-800 hover:text-orange-800">
+              สินค้าทั้งหมด
+            </span>
+          </a>
         </li>
-        <li>
-          <AuthenModal />
-        </li>
-        <li>
-          <Cart />
-        </li>
+        <li class="flex items-center"><AuthenModal /></li>
+        <li class="flex items-ceneter"><Cart /></li>
       </ul>
     </div>
   </div>

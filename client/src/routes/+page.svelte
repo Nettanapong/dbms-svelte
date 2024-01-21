@@ -70,7 +70,7 @@
     <span class="font-bold text-5 text-stone-800">เมล็ดกาแฟ</span>
   </div>
   <div class="p-4 pb-10 mx-12 flex justify-stretch gap-8 flex flex-wrap">
-    {#each products as {id, name, stock, type, maxOrder, price}}
+    {#each products as { id, name, stock, type, maxOrder, price }}
       <Card {id} {name} {stock} {type} {maxOrder} {price} />
     {/each}
   </div>

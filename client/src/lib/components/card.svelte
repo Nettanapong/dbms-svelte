@@ -12,14 +12,10 @@
     if (maxOrder === 0) {
       isEmpty = true;
 
-      setTimeout(() => {
-        isEmpty = false;
-      }, 500);
+      setTimeout(() => (isEmpty = false), 500);
     } else {
       isAdd = true;
-      setTimeout(() => {
-        isAdd = false;
-      }, 1000);
+      setTimeout(() => (isAdd = false), 1000);
       addToCart(id, name, stock, type, maxOrder, price);
     }
   }
@@ -243,6 +239,6 @@
   }
 
   .shake {
-    animation: shake 0.3s ease-in-out infinite;
+    animation: shake 0.3s ease-in-out 3 forwards;
   }
 </style>

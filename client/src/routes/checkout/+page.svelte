@@ -163,8 +163,9 @@
       </div>
       <button
         class="cursor-pointer mt-4 mb-8 w-full rounded-md bg-orange-900 hover:bg-orange-950 px-6 py-3 font-medium text-white"
-        >สั่งซื้อสินค้า</button
       >
+        สั่งซื้อสินค้า
+      </button>
     </div>
   </div>
 </section>

@@ -11,7 +11,7 @@ export interface Order {
   id: string;
   name: string;
   address: string;
-  status: 'PENDING' | 'ACCEPTED' | 'DONE'
+  status: 'PENDING' | 'ACCEPTED' | 'DONE';
   qty: number;
   coffee: Coffee;
 }
