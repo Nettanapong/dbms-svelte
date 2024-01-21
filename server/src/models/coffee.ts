@@ -6,6 +6,8 @@ export const BASE_COFFEE_SELECT = {
   name: true,
   stock: true,
   maxOrder: true,
+  roastedLevel: true,
+  price: true,
   type: true,
 } satisfies Prisma.CoffeeSelect;
 

@@ -1,10 +1,10 @@
+import { z } from "zod";
 import { Router, Status, helpers } from "@oakserver/oak";
 import { PrismaClient } from "@prisma/client";
 import { VILLAGE_SELECT } from "../models/village";
 import { SUB_DISTRICT_SELECT } from "../models/sub-district";
 import { DISTRICT_SELECT } from "../models/district";
 import { PROVINCE_SELECT } from "../models/province";
-import { z } from "zod";
 
 const router = new Router();
 const prisma = new PrismaClient({
@@ -17,6 +17,7 @@ router.get("/village", async (ctx) => {
     provinceId: z.string().length(2).optional(),
     districtId: z.string().length(4).optional(),
     subDistrictId: z.string().length(6).optional(),
+    postCode: z.string().length(5).optional(),
   });
 
   const validate = await schema.safeParseAsync(helpers.getQuery(ctx));
@@ -116,3 +117,5 @@ router.get("/province", async (ctx) => {
     ctx.response.body = result;
   }
 });
+
+export default router;

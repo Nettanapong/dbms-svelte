@@ -40,6 +40,7 @@ router.post("/coffee", async (ctx) => {
     name: z.string(),
     stock: z.number().optional(),
     maxOrder: z.number().optional(),
+    roastedLevel: z.number().optional(),
     type: z.string(),
   });
   const schema = z.union([coffee, coffee.array()]);
@@ -67,6 +68,8 @@ router.patch("/coffee/:id", async (ctx) => {
     id: z.string().length(12),
     name: z.string().optional(),
     stock: z.number().optional(),
+    maxOrder: z.number().optional(),
+    roastedLevel: z.number().optional(),
     typeId: z.string().length(12).optional(),
   });
 

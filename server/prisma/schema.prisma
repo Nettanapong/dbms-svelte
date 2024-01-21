@@ -8,11 +8,13 @@ datasource db {
 }
 
 model Coffee {
-  id       String  @id @default(nanoid(12)) @db.Char(12)
-  name     String
-  stock    Float   @default(0)
-  type     String?
-  maxOrder Float   @default(1)
+  id           String  @id @default(nanoid(12)) @db.Char(12)
+  name         String
+  stock        Float   @default(0)
+  type         String?
+  maxOrder     Float   @default(1)
+  roastedLevel Int     @default(1)
+  price        Float   @default(0)
 
   order Order[]
 
