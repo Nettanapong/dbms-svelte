@@ -1,14 +1,14 @@
 import type { Coffee } from '$lib/types';
 
-let cartProduct = $state<Coffee>();
+let coffee = $state<Coffee>();
 
 export default function useCart() {
   return {
-    get cartProduct() {
-      return cartProduct;
+    get coffee() {
+      return coffee;
     },
-    set cartProduct(v: typeof cartProduct) {
-      cartProduct = v;
+    set coffee(v: typeof coffee) {
+      coffee = v;
     },
   };
 }

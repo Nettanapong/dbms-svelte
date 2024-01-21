@@ -8,11 +8,16 @@ export interface Coffee {
   price: number;
 }
 
+export enum OrderStatus {
+  PENDING = 'PENDING',
+  ACCEPTED = 'ACCEPTED',
+  DONE = 'DONE',
+}
 export interface Order {
   id: string;
   name: string;
   address: string;
-  status: 'PENDING' | 'ACCEPTED' | 'DONE';
+  status: OrderStatus;
   qty: number;
   coffee: Coffee;
 }
