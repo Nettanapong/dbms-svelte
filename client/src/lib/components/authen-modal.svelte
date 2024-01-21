@@ -1,6 +1,6 @@
 <script lang="ts">
-  import classes from 'svelte-transition-classes';
   import { fade } from 'svelte/transition';
+  import classes from 'svelte-transition-classes';
 
   let open = $state<boolean>(false);
   let register = $state<boolean>(false);
@@ -67,8 +67,9 @@
             <hr class="w-70 h-px my-2 bg-gray-200 border-0 dark:bg-gray-700" />
             <span
               class="absolute px-3 font-medium text-gray-900 -translate-x-1/2 bg-white left-1/2 dark:text-white dark:bg-gray-900"
-              >or</span
             >
+              or
+            </span>
           </div>
           <button
             type="button"
@@ -82,15 +83,21 @@
         <div class="p-4 flex justify-center">
           <div class="text-sm font-medium text-stone-500 dark:text-gray-300">
             {#if register}
-              มีบัญชีแล้ว? <button
+              มีบัญชีแล้ว?
+              <button
                 onclick={() => (register = false)}
-                class="bg-white cursor-pointer text-blue-700 hover:underline">ลงชื่อเข้าใช้</button
+                class="bg-white cursor-pointer text-blue-700 hover:underline"
               >
+                ลงชื่อเข้าใช
+              </button>
             {:else}
-              ไม่มีบัญชีใช่ไหม? <button
+              ไม่มีบัญชีใช่ไหม?
+              <button
                 onclick={() => (register = true)}
-                class="bg-white cursor-pointer text-blue-700 hover:underline">ลงทะเบียน</button
+                class="bg-white cursor-pointer text-blue-700 hover:underline"
               >
+                ลงทะเบียน
+              </button>
             {/if}
           </div>
         </div>

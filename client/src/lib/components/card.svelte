@@ -1,71 +1,51 @@
 <script lang="ts">
-  import classes from 'svelte-transition-classes';
-  import useCart from '$lib/stores/product.svelte';
   import type { Coffee } from '$lib/types';
+  import classes from 'svelte-transition-classes';
 
-  const { addToCart } = useCart();
-  let { id, name, stock, type, maxOrder, price } = $props<Coffee>();
-  let isEmpty = $state<boolean>(false);
-  let isAdd = $state<boolean>(false);
+  let { id: _, name, stock, type, maxOrder, price } = $props<Coffee>();
+
+  let empty = $state(false);
+  let add = $state(false);
+  let qty = $state(stock > 0.1 ? 0.1 : stock);
 
   function toCart() {
-    if (maxOrder === 0) {
-      isEmpty = true;
+    empty = qty === 0;
+    add = qty !== 0;
 
-      setTimeout(() => (isEmpty = false), 500);
-    } else {
-      isAdd = true;
-      setTimeout(() => (isAdd = false), 1000);
-      addToCart(id, name, stock, type, maxOrder, price);
-    }
+    setTimeout(() => {
+      if (add) {
+        // do something
+      }
+      empty = false;
+      add = false;
+    }, 1000);
   }
 
-  function changeQuantity(opt: string) {
-    if (opt === 'add' && stock !== 0) {
-      if (maxOrder !== stock) {
-        maxOrder = Number((maxOrder + 1).toFixed(2));
-      }
-    } else {
-      if (maxOrder !== 0) {
-        maxOrder = Number((maxOrder - 1).toFixed(2));
-      }
-    }
-  }
+  function chQty(opt: 'add' | 'del') {
+    if (opt === 'add' && stock === 0) return;
 
-  function handleInputChange(event: Event) {
-    const inputElement = event.target as HTMLInputElement;
-    const inputValue = parseFloat(inputElement.value) || 0;
+    qty = qty + (opt === 'add' ? 1 : -1);
 
-    if (Number(inputValue.toFixed(2)) > stock) {
-      maxOrder = stock;
-    } else {
-      maxOrder = Number(inputValue.toFixed(2));
-    }
+    if (opt === 'add' && qty >= stock) qty = stock;
+    if (opt === 'del' && qty <= 0) qty = 0;
   }
 </script>
 
-<div class=" bg-white rounded-md shadow-lg w-70">
+<div class="bg-white rounded-md shadow-lg w-70">
   <div class="flex justify-center">
-    {#if stock === 0}
-      <img
-        class="rounded-t-lg object-contain h-70 w-70 justify-center grayscale"
-        src="/src/lib/assets/product.png"
-        alt="product name"
-      />
-    {:else}
-      <img
-        class="rounded-t-lg object-contain h-70 w-70 justify-center"
-        src="/src/lib/assets/product.png"
-        alt="product name"
-      />
-    {/if}
+    <img
+      class="rounded-t-lg object-contain h-70 w-70 justify-center"
+      class:grayscale={stock === 0}
+      src="/src/lib/assets/product.png"
+      alt="product name"
+    />
   </div>
   <div class="px-5 pb-8">
     <div class="flex items-center justify-between">
       <span class="text-xl font-semibold tracking-tight text-stone-800">
         {name}
       </span>
-      <span class="text-lg font-bold text-orange-900">฿{price.toFixed(2)}</span>
+      <span class="text-lg font-bold text-orange-900">฿{price}</span>
     </div>
 
     <span class="text-stone-800 font-bold">
@@ -73,16 +53,16 @@
     </span>
 
     <div>
-      <span class="text-sm text-stone-500 pb-10">คงเหลือ: {stock.toFixed(2)} กิโลกรัม</span>
+      <span class="text-sm text-stone-500 pb-10">คงเหลือ: {stock} กิโลกรัม</span>
       <form class="max-w-full mx-auto mt-3">
-        <label for="quantity-input" class="block mb-2 text-sm font-medium text-gray-900"
-          >ระบุขนาด (กิโลกรัม):</label
-        >
+        <label for="quantity-input" class="block mb-2 text-sm font-medium text-gray-900">
+          ระบุขนาด (กิโลกรัม):
+        </label>
         <div class="relative flex items-center w-full">
           <button
             type="button"
             id="decrement-button"
-            onclick={() => changeQuantity('del')}
+            onclick={() => chQty('del')}
             class="bg-stone-100 border border-stone-300 rounded-s-lg p-3 h-11 hover:bg-stone-200 cursor-pointer"
           >
             <svg
@@ -102,20 +82,19 @@
             </svg>
           </button>
           <input
-            type="text"
             id="quantity-input"
-            oninput={(e) => handleInputChange(e)}
-            aria-describedby="helper-text-explanation"
+            type="text"
             class="bg-stone-50 border-x-0 border border-stone-300 h-11 text-center text-stone-900 text-sm w-full block py-2.5"
-            value={maxOrder}
+            bind:value={qty}
+            max={maxOrder}
             required
           />
 
           <button
             type="button"
             id="increment-button"
-            onclick={() => changeQuantity('add')}
             class="bg-stone-100 border border-stone-300 rounded-e-lg p-3 h-11 hover:bg-stone-200 cursor-pointer"
+            onclick={() => chQty('add')}
           >
             <svg
               class="w-3 h-3 text-stone-900 flex items-center"
@@ -134,15 +113,14 @@
             </svg>
           </button>
         </div>
-        {#if isEmpty}
-          <p id="helper-text-explanation" class="mt-2 text-xs font-medium text-red shake">
-            ระบุขนาดที่ต้องการก่อนกด เพิ่มลงในรถเข็น
-          </p>
-        {:else}
-          <p id="helper-text-explanation" class="mt-2 text-xs font-medium text-stone-500">
-            ระบุขนาดที่ต้องการก่อนกด เพิ่มลงในรถเข็น
-          </p>
-        {/if}
+        <p
+          class="mt-2 text-xs font-medium transtion duration-300"
+          class:text-stone-500={!empty}
+          class:text-red={empty}
+          class:shake={empty}
+        >
+          ระบุขนาดที่ต้องการก่อนกด เพิ่มลงในรถเข็น
+        </p>
       </form>
     </div>
 
@@ -159,7 +137,7 @@
 </div>
 
 <!-- Toast -->
-{#if isAdd}
+{#if add}
   <div class="fixed bottom-5 left-1/2 transform -translate-x-1/2">
     <div
       class="flex items-center w-full max-w-xs p-4 mb-4 text-stone-500 bg-white rounded-lg shadow-lg"
@@ -191,7 +169,7 @@
       </div>
       <div class="ms-3 text-sm font-normal">เพิ่มสินค้าลงในรถเข็นแล้ว</div>
       <button
-        onclick={() => (isAdd = false)}
+        onclick={() => (add = false)}
         type="button"
         class="cursor-pointer text-stone-400 bg-transparent hover:bg-gray-200 hover:text-stone-800 rounded-md text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
         data-modal-hide="default-modal"
@@ -239,6 +217,6 @@
   }
 
   .shake {
-    animation: shake 0.3s ease-in-out 3 forwards;
+    animation: shake 0.3s ease-in-out forwards;
   }
 </style>

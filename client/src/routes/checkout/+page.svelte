@@ -1,8 +1,7 @@
 <script lang="ts">
   import useCart from '$lib/stores/product.svelte';
 
-  const { removeFromCart } = useCart();
-  const productStore = useCart();
+  const product = useCart();
   let shippingPrice = 0;
 </script>
 
@@ -13,7 +12,7 @@
 
   <div class="p-4 mx-12 pb-10 flex flex-row justify-between items-start gap-6">
     <div class="w-3/6 rounded-md shadow-lg bg-white p-4">
-      {#if productStore.cartProduct?.maxOrder}
+      {#if product.cartProduct?.maxOrder}
         <div class="flex flex-row items-center w-full px-4 py-6">
           <div class="h-30 w-30 flex-shrink-0 overflow-hidden rounded-md border border-stone-200">
             <img
@@ -23,19 +22,19 @@
             />
           </div>
           <div class="flex w-full flex-col ml-4">
-            <span class="font-semibold text-xl">{productStore.cartProduct?.name}</span>
-            <span class="font-semibold">{productStore.cartProduct?.type}</span>
+            <span class="font-semibold text-xl">{product.cartProduct?.name}</span>
+            <span class="font-semibold">{product.cartProduct?.type}</span>
             <span class="float-right text-stone-500 text-sm py-3"
-              >จำนวน {productStore.cartProduct?.maxOrder} กิโลกรัม</span
+              >จำนวน {product.cartProduct?.maxOrder} กิโลกรัม</span
             >
             <span class="text-lg"
-              >฿{productStore.cartProduct?.maxOrder
-                ? (productStore.cartProduct?.price * productStore.cartProduct?.maxOrder).toFixed(2)
+              >฿{product.cartProduct?.maxOrder
+                ? (product.cartProduct?.price * product.cartProduct?.maxOrder).toFixed(2)
                 : '0'}</span
             >
           </div>
           <button
-            onclick={removeFromCart}
+            onclick={product.removeFromCart}
             class="flex items-center justify-center h-7 w-7 bg-white cursor-pointer"
           >
             <svg
@@ -139,8 +138,8 @@
           <div class="flex items-center justify-between">
             <p class="text-sm font-medium text-stone-800">ราคารวม</p>
             <p class="font-semibold text-stone-800">
-              ฿{productStore.cartProduct?.maxOrder
-                ? (productStore.cartProduct?.price * productStore.cartProduct?.maxOrder).toFixed(2)
+              ฿{product.cartProduct?.maxOrder
+                ? (product.cartProduct?.price * product.cartProduct?.maxOrder).toFixed(2)
                 : '0'}
             </p>
           </div>
@@ -152,9 +151,9 @@
         <div class="mt-6 flex items-center justify-between">
           <p class="text-sm font-medium text-stone-800">ราคาสุทธิ</p>
           <p class="text-2xl font-semibold text-stone-800">
-            ฿{productStore.cartProduct?.maxOrder
+            ฿{product.cartProduct?.maxOrder
               ? (
-                  productStore.cartProduct?.price * productStore.cartProduct?.maxOrder +
+                  product.cartProduct?.price * product.cartProduct?.maxOrder +
                   shippingPrice
                 ).toFixed(2)
               : '0'}

@@ -1,8 +1,7 @@
 <script lang="ts">
-  import classes from 'svelte-transition-classes';
   import useCart from '$lib/stores/product.svelte';
+  import classes from 'svelte-transition-classes';
 
-  const { removeFromCart } = useCart();
   const productStore = useCart();
   let isOpen = $state<boolean>(false);
 </script>
@@ -91,9 +90,7 @@
                                 <div>
                                   <span>{productStore.cartProduct?.name}</span>
                                 </div>
-                                <span class="ml-4"
-                                  >฿{productStore.cartProduct?.price.toFixed(2)}</span
-                                >
+                                <span class="ml-4">฿{productStore.cartProduct?.price}</span>
                               </div>
                               <span class="mt-1 text-stone-800">
                                 {productStore.cartProduct?.type}
@@ -101,13 +98,12 @@
                             </div>
                             <div class="flex flex-1 justify-between items-center text-sm pt-3">
                               <p class="text-stone-500">
-                                ขนาด {productStore.cartProduct?.maxOrder.toFixed(2)} กิโลกรัม
+                                ขนาด {productStore.cartProduct?.maxOrder} กิโลกรัม
                               </p>
 
                               <div class="flex">
                                 <button
                                   type="button"
-                                  onclick={removeFromCart}
                                   class="cursor-pointer bg-white font-medium text-blue-700 hover:underline"
                                   >ลบ</button
                                 >

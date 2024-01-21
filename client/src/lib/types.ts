@@ -4,6 +4,7 @@ export interface Coffee {
   stock: number;
   type: string;
   maxOrder: number;
+  roastedLevel: number;
   price: number;
 }
 
