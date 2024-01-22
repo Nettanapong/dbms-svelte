@@ -70,14 +70,14 @@
                   <div class="flow-root">
                     <ul role="list" class="-my-6 divide-y divide-stone-200">
                       <!-- Item -->
-                      {#if cart.coffee?.maxOrder}
+                      {#if cart.order.qty}
                         <li class="flex py-6">
                           <div
                             class="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-stone-200"
                           >
                             <img
                               src="/src/lib/assets/product.png"
-                              alt={cart.coffee?.name}
+                              alt={cart.order.coffee.name}
                               class="h-full w-full object-cover object-center"
                             />
                           </div>
@@ -88,21 +88,22 @@
                                 class="flex justify-between text-base font-medium text-stone-800"
                               >
                                 <div>
-                                  <span>{cart.coffee?.name}</span>
+                                  <span>{cart.order.coffee.name}</span>
                                 </div>
-                                <span class="ml-4">฿{cart.coffee?.price}</span>
+                                <span class="ml-4">฿{cart.order.coffee.price}</span>
                               </div>
                               <span class="mt-1 text-stone-800">
-                                {cart.coffee?.type}
+                                {cart.order.coffee.type}
                               </span>
                             </div>
                             <div class="flex flex-1 justify-between items-center text-sm pt-3">
                               <p class="text-stone-500">
-                                ขนาด {cart.coffee?.maxOrder} กิโลกรัม
+                                ขนาด {cart.order.qty} กิโลกรัม
                               </p>
 
                               <div class="flex">
                                 <button
+                                  onclick={cart.removeFromCart}
                                   type="button"
                                   class="cursor-pointer bg-white font-medium text-blue-700 hover:underline"
                                   >ลบ</button
@@ -123,16 +124,14 @@
                 <div class="flex justify-between text-base font-medium text-stone-800">
                   <p>ราคารวม</p>
                   <p>
-                    ฿{cart.coffee?.maxOrder
-                      ? (cart.coffee?.price * cart.coffee?.maxOrder).toFixed(2)
-                      : '0'}
+                    ฿{cart.order.qty ? cart.coffee?.price * cart.order.qty : '0'}
                   </p>
                 </div>
                 <p class="mt-0.5 text-sm text-stone-500">ค่าจัดส่งจะคำนวณหลังสั่งซื้อ</p>
                 <div class="mt-6">
                   <a
-                    onclick={() => (cart.coffee?.maxOrder ? (open = false) : '')}
-                    href={cart.coffee?.maxOrder ? '/checkout' : '/'}
+                    onclick={() => (cart.order.qty ? (open = false) : '')}
+                    href={cart.order.qty ? '/checkout' : '/'}
                     type="button"
                     class="flex w-full no-underline cursor-pointer items-center justify-center rounded-md bg-orange-900 hover:bg-orange-950 px-6 py-3 text-base font-medium text-white"
                     >สั่งซื้อ</a

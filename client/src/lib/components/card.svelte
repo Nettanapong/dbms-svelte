@@ -1,8 +1,11 @@
 <script lang="ts">
-  import type { Coffee } from '$lib/types';
   import classes from 'svelte-transition-classes';
+  import useCart from '$lib/stores/product.svelte';
+  import type { Coffee } from '$lib/types';
 
-  let { id: _, name, stock, type, maxOrder, price } = $props<Coffee>();
+  let { id: id, name, stock, type, maxOrder, roastedLevel, price } = $props<Coffee>();
+
+  const cart = useCart();
 
   let empty = $state(false);
   let add = $state(false);
@@ -11,6 +14,18 @@
   function toCart() {
     empty = qty === 0;
     add = qty !== 0;
+    if (add) {
+      cart.coffee.id = id;
+      cart.coffee.name = name;
+      cart.coffee.stock = stock;
+      cart.coffee.type = type;
+      cart.coffee.maxOrder = maxOrder;
+      cart.coffee.roastedLevel = roastedLevel;
+      cart.coffee.price = price;
+
+      cart.order.qty = qty
+      cart.order.coffee = cart.coffee
+    }
 
     setTimeout(() => {
       empty = false;
@@ -18,13 +33,13 @@
     }, 1000);
   }
 
-  function chQty(opt: 'add' | 'del') {
-    if (opt === 'add' && stock === 0) return;
+  function chQty(opt: 'inc' | 'dec') {
+    if (opt === 'inc' && stock === 0) return;
 
-    qty = qty + (opt === 'add' ? 1 : -1);
+    qty = qty + (opt === 'inc' ? 1 : -1);
 
-    if (opt === 'add' && qty >= stock) qty = stock;
-    if (opt === 'del' && qty <= 0) qty = 0;
+    if (opt === 'inc' && qty >= stock) qty = stock;
+    if (opt === 'dec' && qty <= 0) qty = 0;
   }
 </script>
 
@@ -59,7 +74,7 @@
           <button
             type="button"
             id="decrement-button"
-            onclick={() => chQty('del')}
+            onclick={() => chQty('dec')}
             class="bg-stone-100 border border-stone-300 rounded-s-lg p-3 h-11 hover:bg-stone-200 cursor-pointer"
           >
             <div class="i-mdi:minus h-3 w-3"></div>
@@ -77,7 +92,7 @@
             type="button"
             id="increment-button"
             class="bg-stone-100 border border-stone-300 rounded-e-lg p-3 h-11 hover:bg-stone-200 cursor-pointer"
-            onclick={() => chQty('add')}
+            onclick={() => chQty('inc')}
           >
             <div class="i-mdi:plus h-3 w-3"></div>
           </button>
@@ -107,7 +122,7 @@
 
 <!-- Toast -->
 {#if add}
-  <div class="fixed bottom-5 left-1/2 transform -translate-x-1/2">
+  <div class="fixed bottom-5 left-1/2 transform -translate-x-1/2" style="z-index: 1;">
     <div
       class="flex items-center w-full max-w-xs p-4 mb-4 text-stone-500 bg-white rounded-lg shadow-lg"
       role="alert"
