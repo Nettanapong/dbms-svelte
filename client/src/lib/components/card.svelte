@@ -6,16 +6,13 @@
 
   let empty = $state(false);
   let add = $state(false);
-  let qty = $state(stock > 0.1 ? 0.1 : stock);
+  let qty = $state(0);
 
   function toCart() {
     empty = qty === 0;
     add = qty !== 0;
 
     setTimeout(() => {
-      if (add) {
-        // do something
-      }
       empty = false;
       add = false;
     }, 1000);
@@ -65,21 +62,7 @@
             onclick={() => chQty('del')}
             class="bg-stone-100 border border-stone-300 rounded-s-lg p-3 h-11 hover:bg-stone-200 cursor-pointer"
           >
-            <svg
-              class="w-3 h-3 text-stone-900 flex items-center"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 18 2"
-            >
-              <path
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M1 1h16"
-              />
-            </svg>
+            <div class="i-mdi:minus h-3 w-3"></div>
           </button>
           <input
             id="quantity-input"
@@ -96,21 +79,7 @@
             class="bg-stone-100 border border-stone-300 rounded-e-lg p-3 h-11 hover:bg-stone-200 cursor-pointer"
             onclick={() => chQty('add')}
           >
-            <svg
-              class="w-3 h-3 text-stone-900 flex items-center"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 18 18"
-            >
-              <path
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 1v16M1 9h16"
-              />
-            </svg>
+            <div class="i-mdi:plus h-3 w-3"></div>
           </button>
         </div>
         <p
@@ -158,14 +127,7 @@
       <div
         class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-green-500 bg-green-100 rounded-lg"
       >
-        <svg class="w-5 h-5 text-green-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-          />
-        </svg>
+        <div class="i-mdi:cart-outline h-5 w-5 text-green-800"></div>
       </div>
       <div class="ms-3 text-sm font-normal">เพิ่มสินค้าลงในรถเข็นแล้ว</div>
       <button
@@ -174,21 +136,7 @@
         class="cursor-pointer text-stone-400 bg-transparent hover:bg-gray-200 hover:text-stone-800 rounded-md text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
         data-modal-hide="default-modal"
       >
-        <svg
-          class="w-3 h-3"
-          aria-hidden="true"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 14 14"
-        >
-          <path
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
-          />
-        </svg>
+        <div class="i-mdi:close h-6 w-6"></div>
       </button>
     </div>
   </div>
