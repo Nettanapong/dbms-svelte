@@ -33,27 +33,9 @@
                 : '0'}</span
             >
           </div>
-          <button
-            onclick={product.removeFromCart}
-            class="flex items-center justify-center h-7 w-7 bg-white cursor-pointer"
-          >
-            <svg
-              class="h-6 w-6 text-stone-400 hover:text-red"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              stroke-width="2"
-              stroke="currentColor"
-              fill="none"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path stroke="none" d="M0 0h24v24H0z" /> <line x1="4" y1="7" x2="20" y2="7" />
-              <line x1="10" y1="11" x2="10" y2="17" /> <line x1="14" y1="11" x2="14" y2="17" />
-              <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
-              <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" /></svg
-            ></button
-          >
+          <button class="flex items-center justify-center h-7 w-7 bg-white cursor-pointer">
+            <div class="i-mdi:delete-outline h-6 w-6 text-stone-400 hover:text-red"></div>
+          </button>
         </div>
       {:else}
         <span class="flex justify-center text-stone-500">ยังไม่มีสินค้า</span>
@@ -64,7 +46,7 @@
       <p class="text-xl font-medium">รายละเอียดการสั่งซื้อ</p>
       <p class="text-gray-400">ตรวจสอบรายละเอียดการสั่งซื้อให้ครบถ้วน</p>
       <div>
-        <label for="email" class="mt-4 mb-2 block text-sm font-medium">ชื่อ นามสกุล</label>
+        <label for="name" class="mt-4 mb-2 block text-sm font-medium">ชื่อ นามสกุล</label>
         <div class="relative">
           <input
             type="text"
@@ -74,23 +56,11 @@
             placeholder="นายกอไก่ ขอไข่"
           />
           <div class="pointer-events-none absolute inset-y-0 left-0 inline-flex items-center px-3">
-            <svg
-              class="h-4 w-4 text-stone-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
+            <div class="i-mdi:account-circle-outline h-4 w-4 text-stone-400"></div>
           </div>
         </div>
 
-        <label for="email" class="mt-4 mb-2 block text-sm font-medium">เบอร์โทรศัพท์</label>
+        <label for="phone" class="mt-4 mb-2 block text-sm font-medium">เบอร์โทรศัพท์</label>
         <div class="relative">
           <input
             type="text"
@@ -100,18 +70,7 @@
             placeholder="1234567890"
           />
           <div class="pointer-events-none absolute inset-y-0 left-0 inline-flex items-center px-3">
-            <svg
-              class="h-4 w-4 text-stone-400"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
-              <line x1="12" y1="18" x2="12.01" y2="18" /></svg
-            >
+            <div class="i-mdi:cellphone h-4 w-4 text-stone-400"></div>
           </div>
         </div>
 
