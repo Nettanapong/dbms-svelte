@@ -20,17 +20,17 @@ erDiagram
     VILLAGE {
       string(8) id PK
       string name
-      string(6) subDistrictId 
+      string(6) subDistrictId FK
     }
     SUB_DISTRICT {
       string(6) id PK
       string name
-      string(4) districtId 
+      string(4) districtId FK
     }
     DISTRICT {
       string(4) id PK
       string name
-      string(2) provinceId 
+      string(2) provinceId FK 
     }
     PROVINCE {
       string(2) id PK
