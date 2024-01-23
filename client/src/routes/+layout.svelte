@@ -8,14 +8,14 @@
 
   import AuthModal from '$lib/components/auth-modal.svelte';
   import Cart from '$lib/components/cart.svelte';
-
+  import Logo from '$lib/assets/coffee-beans.png';
   const { children } = $props();
 </script>
 
-<article class=":uno: font-sans bg-stone-100">
+<article class=":uno: font-sans">
   <nav class="bg-white shadow-lg flex justify-between px-4 py-2 items-center">
     <a href="/" class="flex items-center space-x-4 no-underline">
-      <img src="/src/lib/assets/coffee-beans.png" class="h-10" alt="Coffee Logo" />
+      <img src={Logo} class="h-10" alt="Coffee Logo" />
       <span class="text-3xl font-bold text-stone-800 hover:text-orange-800">C O F F E E</span>
     </a>
     <div class="hidden w-full md:block md:w-auto" id="navbar-solid-bg">
@@ -24,6 +24,13 @@
           <a href="/" class="no-underline">
             <span class="h-8 w-8 font-semibold text-stone-800 hover:text-orange-800">
               สินค้าทั้งหมด
+            </span>
+          </a>
+        </li>
+        <li class="flex items-center">
+          <a href="/status" class="no-underline">
+            <span class="h-8 w-8 font-semibold text-stone-800 hover:text-orange-800">
+              รายการสั่งซื้อ
             </span>
           </a>
         </li>

@@ -6,6 +6,30 @@
   let orderPrice = cart.order.coffee.price * cart.order.qty;
   let shippingPrice = 0;
   let totalPrice = orderPrice + shippingPrice;
+  let address = $state('');
+  let zip = $state('');
+
+  function submit() {
+    cart.order.address = address + ' ' + zip;
+    fetch('http://localhost:3000/order', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        name: cart.order.name,
+        address: cart.order.address,
+        qty: cart.order.qty,
+        coffeeId: cart.order.coffee.id,
+      }),
+    })
+      .then(() => {
+        window.location.href = '/status';
+      })
+      .catch((error) => {
+        console.error('Error submitting order:', error);
+      });
+  }
 </script>
 
 <section>
@@ -81,19 +105,27 @@
         </div> -->
 
         <label for="address" class="mt-4 mb-2 block text-sm font-medium">ที่อยู่ในการจัดส่ง</label>
-        <div class="flex flex-row gap-x-2">
+        <div class="flex flex-col gap-y-2">
+          <textarea
+            bind:value={address}
+            name="address-state"
+            rows="4"
+            class="w-full rounded-md border border-stone-200 px-4 py-3 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
+            placeholder="บ้านเลขที่ ถนน ตำบล อำเภอ จังหวัด"
+          ></textarea>
           <input
+            bind:value={zip}
             type="text"
             name="address-zip"
             class="w-2/6 rounded-md border border-stone-200 px-4 py-3 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
             placeholder="รหัสไปรษณีย์"
           />
-          <select
+          <!-- <select
             name="address-state"
             class="w-4/6 rounded-md border border-stone-200 px-4 py-3 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
           >
             <option value="Chiang Mai">เชียงใหม่</option>
-          </select>
+          </select> -->
         </div>
 
         <!-- Total -->
@@ -116,11 +148,13 @@
           </p>
         </div>
       </div>
-      <button
-        class="cursor-pointer mt-4 mb-8 w-full rounded-md bg-orange-900 hover:bg-orange-950 px-6 py-3 font-medium text-white"
+      <a
+        onclick={submit}
+        href={cart.order.qty ? '/status' : '/checkout'}
+        type="button"
+        class="cursor-pointer no-underline flex justify-center items-center mt-4 mb-8 w-full rounded-md bg-orange-900 hover:bg-orange-950 px-6 py-3 font-medium text-white"
+        >สั่งซื้อสินค้า</a
       >
-        สั่งซื้อสินค้า
-      </button>
     </div>
   </div>
 </section>
