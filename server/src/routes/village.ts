@@ -17,7 +17,6 @@ router.get("/village", async (ctx) => {
     provinceId: z.string().length(2).optional(),
     districtId: z.string().length(4).optional(),
     subDistrictId: z.string().length(6).optional(),
-    postCode: z.string().length(5).optional(),
   });
 
   const validate = await schema.safeParseAsync(helpers.getQuery(ctx));
@@ -52,6 +51,7 @@ router.get("/sub-district", async (ctx) => {
     name: z.string().optional(),
     provinceId: z.string().length(2).optional(),
     districtId: z.string().length(4).optional(),
+    postCode: z.string().length(5).optional(),
   });
 
   const validate = await schema.safeParseAsync(helpers.getQuery(ctx));
@@ -61,6 +61,7 @@ router.get("/sub-district", async (ctx) => {
   const result = await prisma.subDistrict.findMany({
     select: SUB_DISTRICT_SELECT,
     where: {
+      id: { startsWith: validate.data.postCode },
       name: validate.data.name,
       district: {
         id: validate.data.districtId,
@@ -82,7 +83,7 @@ router.get("/district", async (ctx) => {
   const schema = z.object({
     name: z.string().optional(),
     provinceId: z.string().length(2).optional(),
-    districtId: z.string().length(4).optional(),
+    postCode: z.string().length(5).optional(),
   });
 
   const validate = await schema.safeParseAsync(helpers.getQuery(ctx));
@@ -92,6 +93,7 @@ router.get("/district", async (ctx) => {
   const result = await prisma.district.findMany({
     select: DISTRICT_SELECT,
     where: {
+      id: validate.data.postCode?.substring(0, 4),
       name: validate.data.name,
       province: {
         id: validate.data.provinceId,
@@ -107,8 +109,20 @@ router.get("/district", async (ctx) => {
 });
 
 router.get("/province", async (ctx) => {
-  const result = await prisma.subDistrict.findMany({
+  const schema = z.object({
+    name: z.string().optional(),
+    postCode: z.string().length(5).optional(),
+  });
+
+  const validate = await schema.safeParseAsync(helpers.getQuery(ctx));
+
+  if (!validate.success) return ctx.throw(Status.UnprocessableEntity, "Invalid Query Parameters");
+
+  const result = await prisma.province.findMany({
     select: PROVINCE_SELECT,
+    where: {
+      id: validate.data.postCode?.substring(0, 2),
+    },
     orderBy: [{ id: "desc" }],
   });
 
