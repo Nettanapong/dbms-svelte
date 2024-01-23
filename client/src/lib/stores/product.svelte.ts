@@ -36,6 +36,8 @@ function removeFromCart() {
       price: 0,
     },
   };
+
+  // name, address, qty, coffeeId
 }
 
 export default function useCart() {
