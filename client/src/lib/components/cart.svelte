@@ -1,6 +1,7 @@
 <script lang="ts">
   import useCart from '$lib/stores/product.svelte';
   import classes from 'svelte-transition-classes';
+  import ProductImage from '$lib/assets/product.png';
 
   const cart = useCart();
   let open = $state(false);
@@ -76,7 +77,7 @@
                             class="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-stone-200"
                           >
                             <img
-                              src="/src/lib/assets/product.png"
+                              src="{ProductImage}"
                               alt={cart.order.coffee.name}
                               class="h-full w-full object-cover object-center"
                             />

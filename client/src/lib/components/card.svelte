@@ -1,6 +1,7 @@
 <script lang="ts">
   import classes from 'svelte-transition-classes';
   import useCart from '$lib/stores/product.svelte';
+  import ProductImage from '$lib/assets/product.png';
   import type { Coffee } from '$lib/types';
 
   let { id: id, name, stock, type, maxOrder, roastedLevel, price } = $props<Coffee>();
@@ -48,7 +49,7 @@
     <img
       class="rounded-t-lg object-contain h-70 w-70 justify-center"
       class:grayscale={stock === 0}
-      src="/src/lib/assets/product.png"
+      src="{ProductImage}"
       alt="product name"
     />
   </div>
