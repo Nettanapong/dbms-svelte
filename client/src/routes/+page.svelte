@@ -1,12 +1,14 @@
 <script lang="ts">
   import Card from '$lib/components/card.svelte';
   import BackToTop from '$lib/components/back-to-top.svelte';
+  import BannerImage from '$lib/assets/banner.jpg';
+
   let { data } = $props();
 </script>
 
 <section>
   <div class="max-w-screen relative">
-    <img class="w-full" src="/src/lib/assets/banner.jpg" alt="coffee beans banner" />
+    <img class="w-full" src={BannerImage} alt="coffee beans banner" />
     <div class="top-45 px-12 absolute flex flex-col">
       <span class="text-white text-5xl">COFFEE BEANS</span>
       <span class="text-white text-5">ขายส่งเมล็ดกาแฟ</span>

@@ -1,5 +1,6 @@
 <script lang="ts">
   import useCart from '$lib/stores/product.svelte';
+  import ProductImage from '$lib/assets/product.png';
 
   const cart = useCart();
   let orderPrice = cart.order.coffee.price * cart.order.qty;
@@ -19,8 +20,8 @@
           <div class="h-35 w-35 flex-shrink-0 overflow-hidden rounded-md border border-stone-200">
             <img
               class="h-full w-full object-cover object-center"
-              src="/src/lib/assets/product.png"
-              alt="{cart.order.coffee.name}"
+              src={ProductImage}
+              alt={cart.order.coffee.name}
             />
           </div>
           <div class="flex w-full flex-col ml-4">
