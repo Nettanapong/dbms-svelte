@@ -30,7 +30,7 @@ erDiagram
     DISTRICT {
       string(4) id PK
       string name
-      string(2) provinceId FK 
+      string(2) provinceId FK
     }
     PROVINCE {
       string(2) id PK
