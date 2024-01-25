@@ -65,7 +65,7 @@ router.post("/order", async (ctx) => {
     });
   });
 
-  ws.io.emit("OrderRecieved");
+  ws.io.emit("OrderReceived");
 
   consola.success("Order Success");
   ctx.response.status = 204;
