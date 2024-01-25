@@ -38,6 +38,7 @@ router.get("/coffee/:id", async (ctx) => {
 router.post("/coffee", async (ctx) => {
   const coffee = z.object({
     name: z.string(),
+    price: z.number(),
     stock: z.number().optional(),
     maxOrder: z.number().optional(),
     roastedLevel: z.number().optional(),
@@ -67,6 +68,7 @@ router.patch("/coffee/:id", async (ctx) => {
   const schema = z.object({
     id: z.string().length(12),
     name: z.string().optional(),
+    price: z.number().optional(),
     stock: z.number().optional(),
     maxOrder: z.number().optional(),
     roastedLevel: z.number().optional(),
