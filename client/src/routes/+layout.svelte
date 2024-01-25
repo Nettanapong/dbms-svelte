@@ -16,7 +16,7 @@
   <nav class="bg-white shadow-lg flex justify-between px-4 py-2 items-center">
     <a href="/" class="flex items-center space-x-4 no-underline">
       <img src={Logo} class="h-10" alt="Coffee Logo" />
-      <span class="text-3xl font-bold text-stone-800 hover:text-orange-800">C O F F E E</span>
+      <span class="text-3xl font-bold text-stone-800">C O F F E E</span>
     </a>
     <div class="hidden w-full md:block md:w-auto" id="navbar-solid-bg">
       <ul class="flex flex-row space-x-8 my-0">
@@ -31,6 +31,13 @@
           <a href="/status" class="no-underline">
             <span class="h-8 w-8 font-semibold text-stone-800 hover:text-orange-800">
               รายการสั่งซื้อ
+            </span>
+          </a>
+        </li>
+        <li class="flex items-center">
+          <a href="/manage" class="no-underline">
+            <span class="h-8 w-8 font-semibold text-stone-800 hover:text-orange-800">
+              จัดการสินค้า
             </span>
           </a>
         </li>

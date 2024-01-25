@@ -24,8 +24,8 @@
       cart.coffee.roastedLevel = roastedLevel;
       cart.coffee.price = price;
 
-      cart.order.qty = qty
-      cart.order.coffee = cart.coffee
+      cart.order.qty = qty;
+      cart.order.coffee = cart.coffee;
     }
 
     setTimeout(() => {
@@ -36,11 +36,23 @@
 
   function chQty(opt: 'inc' | 'dec') {
     if (opt === 'inc' && stock === 0) return;
+    if (opt === 'inc' && qty === maxOrder) return;
 
     qty = qty + (opt === 'inc' ? 1 : -1);
 
     if (opt === 'inc' && qty >= stock) qty = stock;
     if (opt === 'dec' && qty <= 0) qty = 0;
+  }
+
+  function handleInputChange(event: Event) {
+    const inputElement = event.target as HTMLInputElement;
+    const inputValue = parseFloat(inputElement.value) || 0;
+
+    if (Number(inputValue) > maxOrder) {
+      qty = maxOrder;
+    } else {
+      qty = Number(inputValue);
+    }
   }
 </script>
 
@@ -49,7 +61,7 @@
     <img
       class="rounded-t-lg object-contain h-70 w-70 justify-center"
       class:grayscale={stock === 0}
-      src="{ProductImage}"
+      src={ProductImage}
       alt="product name"
     />
   </div>
@@ -83,9 +95,10 @@
           <input
             id="quantity-input"
             type="text"
+            max={maxOrder}
+            oninput={(e) => handleInputChange(e)}
             class="bg-stone-50 border-x-0 border border-stone-300 h-11 text-center text-stone-900 text-sm w-full block py-2.5"
             bind:value={qty}
-            max={maxOrder}
             required
           />
 

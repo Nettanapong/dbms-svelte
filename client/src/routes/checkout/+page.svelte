@@ -2,33 +2,104 @@
   import useCart from '$lib/stores/product.svelte';
   import ProductImage from '$lib/assets/product.png';
 
+  let { data } = $props();
   const cart = useCart();
   let orderPrice = cart.order.coffee.price * cart.order.qty;
   let shippingPrice = 0;
   let totalPrice = orderPrice + shippingPrice;
-  let address = $state('');
-  let zip = $state('');
 
-  function submit() {
-    cart.order.address = address + ' ' + zip;
-    fetch('http://localhost:3000/order', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        name: cart.order.name,
-        address: cart.order.address,
-        qty: cart.order.qty,
-        coffeeId: cart.order.coffee.id,
-      }),
-    })
-      .then(() => {
-        window.location.href = '/status';
-      })
-      .catch((error) => {
-        console.error('Error submitting order:', error);
+  let timer: number;
+  const debounce = (event: Event) => {
+    clearTimeout(timer);
+
+    timer = setTimeout(() => {
+      const target = event.target as HTMLInputElement;
+      zip = target.value;
+      getProvince(zip);
+    }, 800);
+  };
+
+  let zip = $state('');
+  let home = $state('');
+
+  let provinceSelected = $state('');
+  let districtSelected = $state('');
+  let subDistrictSelected = $state('');
+
+  let provinceOption = data.province;
+
+  let districtOption = $derived(async () => {
+    if (provinceSelected.length > 0) {
+      const response = await fetch(`http://localhost:3000/district?provinceId=${provinceSelected}`);
+      const districts = await response.json();
+      return districts;
+    } else {
+      return [];
+    }
+  });
+
+  let subDistrictOption = $derived(async () => {
+    if (districtSelected.length > 0) {
+      const response = await fetch(
+        `http://localhost:3000/sub-district?provinceId=${provinceSelected}&districtId=${districtSelected}`,
+      );
+      const subDistricts = await response.json();
+      return subDistricts;
+    } else {
+      return [];
+    }
+  });
+
+  async function getProvince(zip: string) {
+    if (zip.length === 5) {
+      try {
+        const response = await fetch(`http://localhost:3000/province?postCode=${zip}`);
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch province data');
+        }
+
+        const newProvince = await response.json();
+        provinceSelected = newProvince[0].id;
+        districtSelected = '';
+        subDistrictSelected = '';
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    }
+  }
+
+  async function submit() {
+    cart.order.address = `${home} ${subDistrictSelected} ${districtSelected} ${provinceSelected} ${zip}`;
+    // let order = {
+    //   name: cart.order.name,
+    //   address: cart.order.address,
+    //   qty: cart.order.qty,
+    //   coffeeId: cart.order.coffee.id,
+    // };
+    // console.log(order);
+    try {
+      const response = await fetch('http://localhost:3000/order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: cart.order.name,
+          address: cart.order.address,
+          qty: cart.order.qty,
+          coffeeId: cart.order.coffee.id,
+        }),
       });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit order');
+      }
+
+      window.location.href = '/status';
+    } catch (error) {
+      console.error('Error submitting order:', error);
+    }
   }
 </script>
 
@@ -90,71 +161,98 @@
           </div>
         </div>
 
-        <!-- <label for="phone" class="mt-4 mb-2 block text-sm font-medium">เบอร์โทรศัพท์</label>
-        <div class="relative">
-          <input
-            type="text"
-            id="phone"
-            name="phone"
-            class="w-full rounded-md border border-stone-200 px-4 py-3 pl-11 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
-            placeholder="1234567890"
-          />
-          <div class="pointer-events-none absolute inset-y-0 left-0 inline-flex items-center px-3">
-            <div class="i-mdi:cellphone h-4 w-4 text-stone-400"></div>
-          </div>
-        </div> -->
-
         <label for="address" class="mt-4 mb-2 block text-sm font-medium">ที่อยู่ในการจัดส่ง</label>
         <div class="flex flex-col gap-y-2">
-          <textarea
-            bind:value={address}
-            name="address-state"
-            rows="4"
-            class="w-full rounded-md border border-stone-200 px-4 py-3 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
-            placeholder="บ้านเลขที่ ถนน ตำบล อำเภอ จังหวัด"
-          ></textarea>
-          <input
-            bind:value={zip}
-            type="text"
-            name="address-zip"
-            class="w-2/6 rounded-md border border-stone-200 px-4 py-3 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
-            placeholder="รหัสไปรษณีย์"
-          />
-          <!-- <select
-            name="address-state"
-            class="w-4/6 rounded-md border border-stone-200 px-4 py-3 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
-          >
-            <option value="Chiang Mai">เชียงใหม่</option>
-          </select> -->
-        </div>
+          <div class="flex flex-row gap-x-2">
+            <input
+              on:input={debounce}
+              type="text"
+              name="address-zip"
+              maxlength="5"
+              class="w-2/6 rounded-md border border-stone-200 px-4 py-3 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
+              placeholder="รหัสไปรษณีย์"
+            />
+            <input
+              bind:value={home}
+              type="text"
+              name="address-home"
+              class="w-4/6 rounded-md border border-stone-200 px-4 py-3 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
+              placeholder="บ้านเลขที่"
+            />
+          </div>
 
-        <!-- Total -->
-        <div class="mt-6 border-t border-b border-stone-200 py-2">
-          <div class="flex items-center justify-between">
-            <p class="text-sm font-medium text-stone-800">ราคารวม</p>
-            <p class="font-semibold text-stone-800">
-              ฿{cart.order.qty ? orderPrice : '0'}
+          <div class="flex flex-row gap-x-2">
+            <select
+              bind:value={provinceSelected}
+              name="address-province"
+              class="w-2/6 rounded-md border border-stone-200 px-4 py-3 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
+            >
+              <option selected disabled hidden value="">เลือกจังหวัด</option>
+              {#each provinceOption as province (province.id)}
+                <option
+                  value={province.id}
+                  selected={province.id === provinceSelected ? true : false}
+                >
+                  {province.name}
+                </option>
+              {/each}
+            </select>
+
+            <select
+              bind:value={districtSelected}
+              name="address-district"
+              class="w-2/6 rounded-md border border-stone-200 px-4 py-3 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
+            >
+              <option selected disabled hidden value="">เลือกอำเภอ</option>
+              {#await districtOption() then options}
+                {#each options as district (district.id)}
+                  <option value={district.id}>{district.name}</option>
+                {/each}
+              {/await}
+            </select>
+
+            <select
+              bind:value={subDistrictSelected}
+              name="address-subDistrict"
+              class="w-2/6 rounded-md border border-stone-200 px-4 py-3 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
+            >
+              <option selected disabled hidden value="">เลือกตำบล</option>
+              {#await subDistrictOption() then options}
+                {#each options as subDistrict (subDistrict.id)}
+                  <option value={subDistrict.id}>{subDistrict.name}</option>
+                {/each}
+              {/await}
+            </select>
+          </div>
+
+          <!-- Total -->
+          <div class="mt-6 border-t border-b border-stone-200 py-2">
+            <div class="flex items-center justify-between">
+              <p class="text-sm font-medium text-stone-800">ราคารวม</p>
+              <p class="font-semibold text-stone-800">
+                ฿{cart.order.qty ? orderPrice : '0'}
+              </p>
+            </div>
+            <div class="flex items-center justify-between">
+              <p class="text-sm font-medium text-stone-800">ค่าจัดส่ง</p>
+              <p class="font-semibold text-stone-800">฿{shippingPrice}</p>
+            </div>
+          </div>
+          <div class="mt-6 flex items-center justify-between">
+            <p class="text-sm font-medium text-stone-800">ราคาสุทธิ</p>
+            <p class="text-2xl font-semibold text-stone-800">
+              ฿{cart.order.qty ? totalPrice : '0'}
             </p>
           </div>
-          <div class="flex items-center justify-between">
-            <p class="text-sm font-medium text-stone-800">ค่าจัดส่ง</p>
-            <p class="font-semibold text-stone-800">฿{shippingPrice}</p>
-          </div>
         </div>
-        <div class="mt-6 flex items-center justify-between">
-          <p class="text-sm font-medium text-stone-800">ราคาสุทธิ</p>
-          <p class="text-2xl font-semibold text-stone-800">
-            ฿{cart.order.qty ? totalPrice : '0'}
-          </p>
-        </div>
+        <a
+          onclick={submit}
+          href={cart.order.qty ? '/status' : '/checkout'}
+          type="button"
+          class="cursor-pointer no-underline flex justify-center items-center mt-4 mb-8 w-full rounded-md bg-orange-900 hover:bg-orange-950 px-6 py-3 font-medium text-white"
+          >สั่งซื้อสินค้า</a
+        >
       </div>
-      <a
-        onclick={submit}
-        href={cart.order.qty ? '/status' : '/checkout'}
-        type="button"
-        class="cursor-pointer no-underline flex justify-center items-center mt-4 mb-8 w-full rounded-md bg-orange-900 hover:bg-orange-950 px-6 py-3 font-medium text-white"
-        >สั่งซื้อสินค้า</a
-      >
     </div>
   </div>
 </section>
