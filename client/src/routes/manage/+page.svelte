@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { invalidate, invalidateAll } from '$app/navigation';
   import BackToTop from '$lib/components/back-to-top.svelte';
   import CoffeeModal from './coffee-modal.svelte';
   import DeleteCoffeeModal from './delete-coffee-modal.svelte';
@@ -27,25 +28,30 @@
           </tr>
         </thead>
         <tbody>
-          {#each data.coffee as coffee}
+          {#if data.coffee.length > 0}
+            {#each data.coffee as coffee}
+              <tr class="bg-white border-t border-stone-200 hover:bg-stone-50">
+                <th scope="row" class="px-6 py-4 font-medium text-stone-900 whitespace-nowrap">
+                  {coffee.name}
+                </th>
+                <td class="px-6 py-4"> {coffee.type} </td>
+                <td class="px-6 py-4"> {coffee.roastedLevel} </td>
+                <td class="px-6 py-4"> {coffee.stock} </td>
+                <td class="px-6 py-4"> {coffee.maxOrder} </td>
+                <td class="px-6 py-4"> {coffee.price} </td>
+                <td class="px-6 py-4">
+                  <CoffeeModal action="edit" {...coffee} />
+                  <DeleteCoffeeModal id={coffee.id} onDelete={() => invalidateAll()} />
+                </td>
+              </tr>
+            {/each}
+          {:else}
             <tr class="bg-white border-t border-stone-200 hover:bg-stone-50">
-              <th scope="row" class="px-6 py-4 font-medium text-stone-900 whitespace-nowrap">
-                {coffee.name}
-              </th>
-              <td class="px-6 py-4"> {coffee.type} </td>
-              <td class="px-6 py-4"> {coffee.roastedLevel} </td>
-              <td class="px-6 py-4"> {coffee.stock} </td>
-              <td class="px-6 py-4"> {coffee.maxOrder} </td>
-              <td class="px-6 py-4"> {coffee.price} </td>
-              <td class="px-6 py-4">
-                <CoffeeModal action="edit" {...coffee} />
-                <DeleteCoffeeModal
-                  id={coffee.id}
-                  onDelete={() => (data.coffee = data.coffee.filter((v) => v.id !== coffee.id))}
-                />
-              </td>
+              <td colspan="5" class="px-6 py-4 text-center font-medium whitespace-nowrap"
+                >ยังไม่มีข้อมูล</td
+              >
             </tr>
-          {/each}
+          {/if}
         </tbody>
       </table>
     </div>

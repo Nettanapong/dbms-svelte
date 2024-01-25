@@ -19,7 +19,8 @@
 
       if (response.status === 204) {
         console.log('Delete Success');
-        onDelete()
+        open = false;
+        onDelete();
       } else {
         console.error('Delete failed');
       }
