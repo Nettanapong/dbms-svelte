@@ -39,9 +39,9 @@ router.get("/order/:id", async (ctx) => {
 router.post("/order", async (ctx) => {
   const schema = z.object({
     name: z.string(),
-    address: z.string(),
     qty: z.number().gt(0),
     coffeeId: z.string().length(12),
+    villageId: z.string().length(8),
   });
   const validate = await schema.safeParseAsync(await ctx.request.body().value);
 
@@ -67,11 +67,45 @@ router.post("/order", async (ctx) => {
   ctx.response.status = 204;
 });
 
+router.post("/order/:id/cancel", async (ctx) => {
+  const schema = z.object({ id: z.string().length(12) });
+  const validate = await schema.safeParseAsync({ id: ctx.params.id });
+
+  if (!validate.success) return ctx.throw(Status.UnprocessableEntity, "Invalid Body");
+
+  await prisma.$transaction(async (tx) => {
+    const order = await tx.order.findUnique({
+      where: { id: validate.data.id },
+    });
+
+    if (!order) return ctx.throw(Status.NotFound);
+
+    if (order.status !== OrderStatus.PENDING) {
+      return ctx.throw(Status.NotAcceptable, "Too Late");
+    }
+
+    await tx.order.update({
+      data: { status: OrderStatus.CANCELED },
+      where: { id: validate.data.id },
+    });
+
+    await tx.coffee.update({
+      data: {
+        stock: { increment: order.qty },
+      },
+      where: { id: order.coffeeId },
+    });
+  });
+
+  consola.success("Order Success");
+  ctx.response.status = 204;
+});
+
 router.patch("/order/:id", async (ctx) => {
   const schema = z.object({
     id: z.string().length(12),
-    address: z.string(),
     status: z.nativeEnum(OrderStatus),
+    villageId: z.string().length(8),
   });
   const validate = await schema.safeParseAsync(await ctx.request.body().value);
 

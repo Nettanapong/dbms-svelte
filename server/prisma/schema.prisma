@@ -26,17 +26,20 @@ enum OrderStatus {
   PENDING
   ACCEPTED
   DONE
+  CANCELED
 }
 
 model Order {
-  id      String      @id @default(nanoid(12)) @db.Char(12)
-  name    String
-  address String
-  status  OrderStatus
-  qty     Float
+  id     String      @id @default(nanoid(12)) @db.Char(12)
+  name   String
+  status OrderStatus
+  qty    Float
 
-  coffee   Coffee? @relation(fields: [coffeeId], references: [id], onUpdate: SetNull)
-  coffeeId String? @db.Char(12)
+  coffee   Coffee @relation(fields: [coffeeId], references: [id], onUpdate: Cascade)
+  coffeeId String @db.Char(12)
+
+  village   Village @relation(fields: [villageId], references: [id])
+  villageId String  @db.Char(8)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
@@ -78,4 +81,5 @@ model Village {
 
   subDistrict   SubDistrict @relation(fields: [subDistrictId], references: [id])
   subDistrictId String      @db.Char(6)
+  Order         Order[]
 }
