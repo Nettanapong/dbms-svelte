@@ -1,24 +1,15 @@
 <script lang="ts">
+  import { debounce } from '$lib';
   import useCart from '$lib/stores/product.svelte';
   import ProductImage from '$lib/assets/product.png';
+  import { goto } from '$app/navigation';
 
   let { data } = $props();
   const cart = useCart();
-  let orderPrice = cart.order.coffee.price * cart.order.qty;
+
+  let orderPrice = Number(cart.order.coffee?.price) * Number(cart.order.qty);
   let shippingPrice = 0;
   let totalPrice = orderPrice + shippingPrice;
-
-  let timer: number;
-  const debounce = (event: Event) => {
-    clearTimeout(timer);
-
-    timer = setTimeout(() => {
-      const target = event.target as HTMLInputElement;
-      zip = target.value;
-      getProvince(zip);
-    }, 800);
-  };
-
   let zip = $state('');
   let provinceSelected = $state('');
   let districtSelected = $state('');
@@ -27,63 +18,49 @@
 
   let provinceOption = data.province;
 
-  let villageOption = $derived(async () => {
-    if (subDistrictSelected.length > 0) {
-      const res = await fetch(
-        `http://localhost:3000/village?provinceId=${provinceSelected}&districtId=${districtSelected}&subDistrictId=${subDistrictSelected}`,
-      );
-      const districts = await res.json();
-      return districts;
-    } else {
+  let villageOption = $derived(
+    (async () => {
+      if (subDistrictSelected.length > 0) {
+        const res = await fetch(
+          `http://localhost:3000/village?provinceId=${provinceSelected}&districtId=${districtSelected}&subDistrictId=${subDistrictSelected}`,
+        );
+        return await res.json();
+      }
       return [];
-    }
-  });
+    })(),
+  );
 
-  let subDistrictOption = $derived(async () => {
-    if (districtSelected.length > 0) {
-      const res = await fetch(
-        `http://localhost:3000/sub-district?provinceId=${provinceSelected}&districtId=${districtSelected}`,
-      );
-      const subDistricts = await res.json();
-      return subDistricts;
-    } else {
+  let subDistrictOption = $derived(
+    (async () => {
+      if (districtSelected.length > 0) {
+        const res = await fetch(
+          `http://localhost:3000/sub-district?provinceId=${provinceSelected}&districtId=${districtSelected}`,
+        );
+        return await res.json();
+      }
       return [];
-    }
-  });
+    })(),
+  );
 
-  let districtOption = $derived(async () => {
-    if (provinceSelected.length > 0) {
-      const res = await fetch(`http://localhost:3000/district?provinceId=${provinceSelected}`);
-      const districts = await res.json();
-      return districts;
-    } else {
+  let districtOption = $derived(
+    (async () => {
+      if (provinceSelected.length > 0) {
+        const res = await fetch(`http://localhost:3000/district?provinceId=${provinceSelected}`);
+        return await res.json();
+      }
       return [];
-    }
-  });
+    })(),
+  );
 
   async function getProvince(zip: string) {
     if (zip.length === 5) {
-      const res = await fetch(`http://localhost:3000/province?postCode=${zip}`).catch((e) =>
-        console.error('Error: ', e),
-      );
-
-      if (!res) return;
-      if (!res.ok) return console.error('Failed to fetch province:', await res.text());
-
-      const newProvince = await res.json();
-
-      if (newProvince && newProvince.length > 0) {
-        provinceSelected = newProvince[0].id;
-        districtSelected = '';
-        subDistrictSelected = '';
-        villageSelected = '';
-      } else {
-        console.error('No province found for the given zip code.');
-      }
+      provinceSelected = data.province.find((v) => v.id.slice(0, 2) === zip.slice(0, 2))?.id || '';
     }
   }
 
-  async function submit() {
+  async function submit(e: SubmitEvent) {
+    e.preventDefault();
+
     const res = await fetch('http://localhost:3000/order', {
       method: 'POST',
       headers: {
@@ -92,7 +69,7 @@
       body: JSON.stringify({
         name: cart.order.name,
         qty: cart.order.qty,
-        coffeeId: cart.order.coffee.id,
+        coffeeId: cart.order.coffee?.id,
         villageId: villageSelected,
       }),
     }).catch((e) => console.error('Error: ', e));
@@ -101,16 +78,16 @@
     if (!res.ok) return console.error('Failed to submit order:', await res.text());
 
     console.log('Order submitted successfully!');
-    window.location.href = '/status';
+    await goto('/status');
   }
 </script>
 
 <section>
-  <div class="mx-12 pt-10 p-4">
-    <span class="font-bold text-5 text-stone-800">สั่งซื้อ</span>
+  <div class="p-4">
+    <span class="font-bold text-10 text-stone-800">สั่งซื้อ</span>
   </div>
 
-  <div class="p-4 mx-12 pb-10 flex flex-row justify-between items-start gap-6">
+  <div class="p-4 flex flex-row items-start gap-8">
     <div class="w-3/6 rounded-md shadow-lg bg-white p-4">
       {#if cart.order.qty}
         <div class="flex flex-row items-center w-full px-4 py-6">
@@ -118,24 +95,21 @@
             <img
               class="h-full w-full object-cover object-center"
               src={ProductImage}
-              alt={cart.order.coffee.name}
+              alt={cart.order.coffee?.name}
             />
           </div>
           <div class="flex w-full flex-col ml-4">
-            <span class="font-semibold text-xl">{cart.order.coffee.name}</span>
-            <span class="font-semibold">{cart.order.coffee.type}</span>
-            <span class="float-right text-stone-500 text-sm pt-3"
-              >จำนวน {cart.order.qty} กิโลกรัม</span
-            >
-            <span class="float-right text-stone-500 text-sm pb-3"
-              >ราคาต่อหน่วย(กิโลกรัม) ฿{cart.order.coffee.price}</span
-            >
+            <span class="font-semibold text-xl">{cart.order.coffee?.name}</span>
+            <span class="font-semibold">{cart.order.coffee?.type}</span>
+            <span class="float-right text-stone-500 text-sm pt-3">
+              จำนวน {cart.order.qty} กิโลกรัม
+            </span>
+            <span class="float-right text-stone-500 text-sm pb-3">
+              ราคาต่อหน่วย(กิโลกรัม) ฿{cart.order.coffee?.price}
+            </span>
             <span class="text-lg">฿{cart.order.qty ? orderPrice : '0'}</span>
           </div>
-          <button
-            onclick={cart.removeFromCart}
-            class="flex items-center justify-center h-7 w-7 bg-white cursor-pointer"
-          >
+          <button onclick={cart.reset} class="flex items-center h-7 w-7 bg-white cursor-pointer">
             <div class="i-mdi:delete-outline h-6 w-6 text-stone-400 hover:text-red"></div>
           </button>
         </div>
@@ -148,7 +122,7 @@
       <p class="text-xl font-medium">รายละเอียดการสั่งซื้อ</p>
       <p class="text-gray-400">ตรวจสอบรายละเอียดการสั่งซื้อให้ครบถ้วน</p>
       <div>
-        <form on:submit={submit}>
+        <form onsubmit={submit}>
           <label for="name" class="mt-4 mb-2 block text-sm font-medium">ชื่อ นามสกุล</label>
           <div class="relative">
             <input
@@ -160,20 +134,20 @@
               class="w-full rounded-md border border-stone-200 px-4 py-3 pl-11 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
               placeholder="นายกอไก่ ขอไข่"
             />
-            <div
-              class="pointer-events-none absolute inset-y-0 left-0 inline-flex items-center px-3"
-            >
+            <div class="absolute inset-y-0 left-0 inline-flex items-center px-3">
               <div class="i-mdi:account-circle-outline h-4 w-4 text-stone-400"></div>
             </div>
           </div>
 
-          <label for="address" class="mt-4 mb-2 block text-sm font-medium">ที่อยู่ในการจัดส่ง</label
-          >
+          <label for="address" class="mt-4 mb-2 block text-sm font-medium">
+            ที่อยู่ในการจัดส่ง
+          </label>
           <div class="flex flex-col gap-y-2">
             <div class="flex flex-row gap-x-2">
               <input
                 required
-                on:input={debounce}
+                bind:value={zip}
+                on:input={debounce(() => getProvince(zip), 500)}
                 type="text"
                 name="address-zip"
                 maxlength="5"
@@ -206,7 +180,7 @@
                 class="w-2/6 rounded-md border border-stone-200 px-4 py-3 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
               >
                 <option selected disabled hidden value="">เลือกอำเภอ</option>
-                {#await districtOption() then options}
+                {#await districtOption then options}
                   {#each options as district (district.id)}
                     <option value={district.id}>{district.name}</option>
                   {/each}
@@ -216,11 +190,11 @@
               <select
                 required
                 bind:value={subDistrictSelected}
-                name="address-subDistrict"
+                name="address-sub-district"
                 class="w-2/6 rounded-md border border-stone-200 px-4 py-3 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
               >
                 <option selected disabled hidden value="">เลือกตำบล</option>
-                {#await subDistrictOption() then options}
+                {#await subDistrictOption then options}
                   {#each options as subDistrict (subDistrict.id)}
                     <option value={subDistrict.id}>{subDistrict.name}</option>
                   {/each}
@@ -230,11 +204,11 @@
               <select
                 required
                 bind:value={villageSelected}
-                name="address-subDistrict"
+                name="address-sub-district"
                 class="w-2/6 rounded-md border border-stone-200 px-4 py-3 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
               >
                 <option selected disabled hidden value="">เลือกหมู่บ้าน</option>
-                {#await villageOption() then options}
+                {#await villageOption then options}
                   {#each options as village (village.id)}
                     <option value={village.id}>{village.name}</option>
                   {/each}
@@ -265,8 +239,9 @@
           <button
             type="submit"
             class="cursor-pointer no-underline flex justify-center items-center mt-4 mb-8 w-full rounded-md bg-orange-900 hover:bg-orange-950 px-6 py-3 font-medium text-white"
-            >สั่งซื้อสินค้า</button
           >
+            สั่งซื้อสินค้า
+          </button>
         </form>
       </div>
     </div>

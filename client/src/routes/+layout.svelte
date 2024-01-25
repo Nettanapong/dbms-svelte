@@ -9,7 +9,10 @@
   import AuthModal from '$lib/components/auth-modal.svelte';
   import Cart from '$lib/components/cart.svelte';
   import Logo from '$lib/assets/coffee-beans.png';
+
   const { children } = $props();
+
+  let cartState = $state<boolean>(false);
 </script>
 
 <article class=":uno: font-sans">
@@ -41,10 +44,18 @@
             </span>
           </a>
         </li>
-        <li class="flex items-center"><Cart /></li>
         <li class="flex items-center"><AuthModal /></li>
       </ul>
     </div>
   </nav>
   {@render children()}
 </article>
+
+<button
+  onclick={() => (cartState = true)}
+  class="cursor-pointer fixed bottom-2 drop-shadow-2xl right-2 block bg-white rounded-full p-3"
+>
+  <div class="i-mdi:cart-outline h-8 w-8 text-orange-800 transition duration-100"></div>
+</button>
+
+<Cart bind:open={cartState} />

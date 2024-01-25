@@ -4,63 +4,51 @@
   import ProductImage from '$lib/assets/product.png';
   import type { Coffee } from '$lib/types';
 
-  let { id: id, name, stock, type, maxOrder, roastedLevel, price } = $props<Coffee>();
+  let { ...coffee } = $props<Coffee>();
 
   const cart = useCart();
 
   let empty = $state(false);
-  let add = $state(false);
+  let change = $state(false);
   let qty = $state(0);
 
   function toCart() {
     empty = qty === 0;
-    add = qty !== 0;
-    if (add) {
-      cart.coffee.id = id;
-      cart.coffee.name = name;
-      cart.coffee.stock = stock;
-      cart.coffee.type = type;
-      cart.coffee.maxOrder = maxOrder;
-      cart.coffee.roastedLevel = roastedLevel;
-      cart.coffee.price = price;
+    change = qty !== 0;
 
+    if (change) {
       cart.order.qty = qty;
-      cart.order.coffee = cart.coffee;
+      cart.order.coffee = coffee;
     }
 
     setTimeout(() => {
       empty = false;
-      add = false;
+      change = false;
     }, 1000);
   }
 
   function chQty(opt: 'inc' | 'dec') {
-    if (opt === 'inc' && stock === 0) return;
-    if (opt === 'inc' && qty === maxOrder) return;
+    if (opt === 'inc' && coffee.stock === 0) return;
+    if (opt === 'inc' && qty === coffee.maxOrder) return;
 
     qty = qty + (opt === 'inc' ? 1 : -1);
 
-    if (opt === 'inc' && qty >= stock) qty = stock;
+    if (opt === 'inc' && qty >= coffee.stock) qty = coffee.stock;
     if (opt === 'dec' && qty <= 0) qty = 0;
   }
 
   function handleInputChange(event: Event) {
-    const inputElement = event.target as HTMLInputElement;
-    const inputValue = parseFloat(inputElement.value) || 0;
-
-    if (Number(inputValue) > maxOrder) {
-      qty = maxOrder;
-    } else {
-      qty = Number(inputValue);
-    }
+    const element = event.target as HTMLInputElement;
+    const value = parseFloat(element.value) || 0;
+    qty = value > coffee.maxOrder ? coffee.maxOrder : value;
   }
 </script>
 
-<div class="bg-white rounded-md shadow-lg w-70">
+<div class="bg-white rounded-md shadow-lg min-w-70">
   <div class="flex justify-center">
     <img
       class="rounded-t-lg object-contain h-70 w-70 justify-center"
-      class:grayscale={stock === 0}
+      class:grayscale={coffee.stock === 0}
       src={ProductImage}
       alt="product name"
     />
@@ -68,17 +56,17 @@
   <div class="px-5 pb-8">
     <div class="flex items-center justify-between">
       <span class="text-xl font-semibold tracking-tight text-stone-800">
-        {name}
+        {coffee.name}
       </span>
-      <span class="text-lg font-bold text-orange-900">฿{price}</span>
+      <span class="text-lg font-bold text-orange-900">฿{coffee.price}</span>
     </div>
 
     <span class="text-stone-800 font-bold">
-      {type}
+      {coffee.type}
     </span>
 
     <div>
-      <span class="text-sm text-stone-500 pb-10">คงเหลือ: {stock} กิโลกรัม</span>
+      <span class="text-sm text-stone-500 pb-10">คงเหลือ: {coffee.stock} กิโลกรัม</span>
       <form class="max-w-full mx-auto mt-3">
         <label for="quantity-input" class="block mb-2 text-sm font-medium text-gray-900">
           ระบุขนาด (กิโลกรัม):
@@ -95,13 +83,12 @@
           <input
             id="quantity-input"
             type="text"
-            max={maxOrder}
+            max={coffee.maxOrder}
             oninput={(e) => handleInputChange(e)}
             class="bg-stone-50 border-x-0 border border-stone-300 h-11 text-center text-stone-900 text-sm w-full block py-2.5"
             bind:value={qty}
             required
           />
-
           <button
             type="button"
             id="increment-button"
@@ -124,18 +111,18 @@
 
     <div class="flex items-center justify-center mt-5">
       <button
-        disabled={stock === 0 ? true : false}
+        disabled={coffee.stock === 0 ? true : false}
         onclick={toCart}
         class="w-full text-white bg-orange-900 hover:bg-orange-950 font-medium rounded-md text-sm py-2.5 text-center cursor-pointer disabled:bg-stone-400 disabled:cursor-not-allowed"
       >
-        <span>{stock === 0 ? 'สินค้าหมด' : 'เพิ่มลงในรถเข็น'}</span>
+        <span>{coffee.stock === 0 ? 'สินค้าหมด' : 'เพิ่มลงในรถเข็น'}</span>
       </button>
     </div>
   </div>
 </div>
 
 <!-- Toast -->
-{#if add}
+{#if change}
   <div class="fixed bottom-5 left-1/2 transform -translate-x-1/2" style="z-index: 1;">
     <div
       class="flex items-center w-full max-w-xs p-4 mb-4 text-stone-500 bg-white rounded-lg shadow-lg"
@@ -160,7 +147,7 @@
       </div>
       <div class="ms-3 text-sm font-normal">เพิ่มสินค้าลงในรถเข็นแล้ว</div>
       <button
-        onclick={() => (add = false)}
+        onclick={() => (change = false)}
         type="button"
         class="cursor-pointer text-stone-400 bg-transparent hover:bg-gray-200 hover:text-stone-800 rounded-md text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
         data-modal-hide="default-modal"

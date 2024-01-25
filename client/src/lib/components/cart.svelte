@@ -4,12 +4,11 @@
   import ProductImage from '$lib/assets/product.png';
 
   const cart = useCart();
-  let open = $state(false);
-</script>
 
-<button onclick={() => (open = true)} class="cursor-pointer bg-white">
-  <div class="i-mdi:cart-outline h-8 w-8 hover:text-orange-800 transition duration-100"></div>
-</button>
+  let { open } = $props<{
+    open: boolean;
+  }>();
+</script>
 
 {#if open}
   <!-- Overlay -->
@@ -77,8 +76,8 @@
                             class="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-stone-200"
                           >
                             <img
-                              src="{ProductImage}"
-                              alt={cart.order.coffee.name}
+                              src={ProductImage}
+                              alt={cart.order.coffee?.name}
                               class="h-full w-full object-cover object-center"
                             />
                           </div>
@@ -89,12 +88,12 @@
                                 class="flex justify-between text-base font-medium text-stone-800"
                               >
                                 <div>
-                                  <span>{cart.order.coffee.name}</span>
+                                  <span>{cart.order.coffee?.name}</span>
                                 </div>
-                                <span class="ml-4">฿{cart.order.coffee.price}</span>
+                                <span class="ml-4">฿{cart.order.coffee?.price}</span>
                               </div>
                               <span class="mt-1 text-stone-800">
-                                {cart.order.coffee.type}
+                                {cart.order.coffee?.type}
                               </span>
                             </div>
                             <div class="flex flex-1 justify-between items-center text-sm pt-3">
@@ -125,7 +124,7 @@
                 <div class="flex justify-between text-base font-medium text-stone-800">
                   <p>ราคารวม</p>
                   <p>
-                    ฿{cart.order.qty ? cart.coffee?.price * cart.order.qty : '0'}
+                    ฿{Number(cart.order.coffee?.price || 0) * Number(cart.order.qty ?? 0)}
                   </p>
                 </div>
                 <p class="mt-0.5 text-sm text-stone-500">ค่าจัดส่งจะคำนวณหลังสั่งซื้อ</p>

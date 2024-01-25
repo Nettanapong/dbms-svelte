@@ -1,6 +1,5 @@
 <script lang="ts">
   import { invalidateAll } from '$app/navigation';
-  import BackToTop from '$lib/components/back-to-top.svelte';
   import { OrderStatus } from '$lib/types.js';
   import { io } from 'socket.io-client';
 
@@ -91,9 +90,9 @@
             {/each}
           {:else}
             <tr class="bg-white border-t border-stone-200 hover:bg-stone-100">
-              <td colspan="5" class="px-6 py-4 text-center font-medium whitespace-nowrap"
-                >ยังไม่มีข้อมูล</td
-              >
+              <td colspan="5" class="px-6 py-4 text-center font-medium whitespace-nowrap">
+                ยังไม่มีข้อมูล
+              </td>
             </tr>
           {/if}
         </tbody>
@@ -101,5 +100,3 @@
     </div>
   </div>
 </section>
-
-<BackToTop />
