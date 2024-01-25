@@ -17,7 +17,7 @@ export enum OrderStatus {
 export interface Order {
   id: string;
   name: string;
-  address: string;
+  village: string;
   status: OrderStatus;
   qty: number;
   coffee: Coffee;
