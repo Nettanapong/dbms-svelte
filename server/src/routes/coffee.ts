@@ -72,7 +72,7 @@ router.patch("/coffee/:id", async (ctx) => {
     stock: z.number().optional(),
     maxOrder: z.number().optional(),
     roastedLevel: z.number().optional(),
-    typeId: z.string().length(12).optional(),
+    type: z.string().optional(),
   });
 
   const payload = await ctx.request.body().value;
