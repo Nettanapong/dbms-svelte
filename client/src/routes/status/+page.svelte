@@ -1,7 +1,47 @@
 <script lang="ts">
+  import { invalidateAll } from '$app/navigation';
   import BackToTop from '$lib/components/back-to-top.svelte';
+  import { OrderStatus } from '$lib/types.js';
+  import { io } from 'socket.io-client';
 
   let { data } = $props();
+
+  let order = $state(data.order);
+  let statusOption = Object.values(OrderStatus);
+
+  $effect(() => {
+    const socket = io('http://localhost:3001');
+
+    socket.on('OrderReceived', invalidateAll);
+    socket.on('OrderCanceled', invalidateAll);
+    return () => {
+      socket.close();
+    };
+  });
+
+  async function changeStatus(id: string, status: OrderStatus) {
+    const res = await fetch(`http://localhost:3000/order/${id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id: id,
+        status: status,
+      }),
+    }).catch((e) => console.error('Error: ', e));
+
+    if (!res) return;
+    if (!res.ok) return console.error('Failed to change status:', await res.text());
+
+    console.log('Status editted successfully!');
+  }
+
+  $effect(() => {
+    order = data.order;
+
+    return () => {};
+  });
 </script>
 
 <section>
@@ -22,18 +62,31 @@
           </tr>
         </thead>
         <tbody>
-          {#if data.order.length > 0}
-            {#each data.order as order}
+          {#if order.length > 0}
+            {#each order as item (item.id)}
               <tr class="bg-white border-t border-stone-200 hover:bg-stone-100">
-                <th scope="row" class="px-6 py-4 font-medium text-stone-900 whitespace-nowrap">
-                  {order.name}
-                </th>
+                <td class="px-6 py-4"> {item.name} </td>
                 <td class="px-6 py-4">
-                  {`${order.village.name} ต.${order.village.subDistrict.name} อ.${order.village.subDistrict.district.name} จ.${order.village.subDistrict.district.province.name}`}
+                  {`${item.village.name} ต.${item.village.subDistrict.name} อ.${item.village.subDistrict.district.name} จ.${item.village.subDistrict.district.province.name}`}
                 </td>
-                <td class="px-6 py-4"> {order.coffee.name} </td>
-                <td class="px-6 py-4"> {order.qty} </td>
-                <td class="px-6 py-4"> {order.status} </td>
+                <td class="px-6 py-4"> {item.coffee.name} </td>
+                <td class="px-6 py-4"> {item.qty} </td>
+                <td class="px-6 py-4">
+                  <!-- {item.status} -->
+                  <select
+                    bind:value={item.status}
+                    on:change={() => changeStatus(item.id, item.status)}
+                    name="order-status"
+                    class="w-full rounded-md border border-stone-200 px-4 py-3 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
+                  >
+                    {#each statusOption as status (status)}
+                      <option value={status} selected={status === item.status ? true : false}>
+                        {status}
+                      </option>
+                    {/each}
+                  </select>
+                  {console.log(item.status)}
+                </td>
               </tr>
             {/each}
           {:else}

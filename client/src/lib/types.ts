@@ -12,6 +12,7 @@ export enum OrderStatus {
   PENDING = 'PENDING',
   ACCEPTED = 'ACCEPTED',
   DONE = 'DONE',
+  CANCELED = 'CANCELED'
 }
 
 export interface Order {
