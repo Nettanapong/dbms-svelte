@@ -17,8 +17,31 @@ export enum OrderStatus {
 export interface Order {
   id: string;
   name: string;
-  village: string;
+  village: Village;
   status: OrderStatus;
   qty: number;
   coffee: Coffee;
+}
+
+export interface Province {
+  id: string;
+  name: string;
+}
+
+export interface District {
+  id: string;
+  name: string;
+  province: Province;
+}
+
+export interface SubDistrict {
+  id: string;
+  name: string;
+  district: District;
+}
+
+export interface Village {
+  id: string;
+  name: string;
+  subDistrict: SubDistrict;
 }

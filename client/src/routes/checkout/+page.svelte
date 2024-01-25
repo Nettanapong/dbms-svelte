@@ -29,10 +29,10 @@
 
   let villageOption = $derived(async () => {
     if (subDistrictSelected.length > 0) {
-      const response = await fetch(
+      const res = await fetch(
         `http://localhost:3000/village?provinceId=${provinceSelected}&districtId=${districtSelected}&subDistrictId=${subDistrictSelected}`,
       );
-      const districts = await response.json();
+      const districts = await res.json();
       return districts;
     } else {
       return [];
@@ -41,10 +41,10 @@
 
   let subDistrictOption = $derived(async () => {
     if (districtSelected.length > 0) {
-      const response = await fetch(
+      const res = await fetch(
         `http://localhost:3000/sub-district?provinceId=${provinceSelected}&districtId=${districtSelected}`,
       );
-      const subDistricts = await response.json();
+      const subDistricts = await res.json();
       return subDistricts;
     } else {
       return [];
@@ -53,8 +53,8 @@
 
   let districtOption = $derived(async () => {
     if (provinceSelected.length > 0) {
-      const response = await fetch(`http://localhost:3000/district?provinceId=${provinceSelected}`);
-      const districts = await response.json();
+      const res = await fetch(`http://localhost:3000/district?provinceId=${provinceSelected}`);
+      const districts = await res.json();
       return districts;
     } else {
       return [];
@@ -63,48 +63,45 @@
 
   async function getProvince(zip: string) {
     if (zip.length === 5) {
-      try {
-        const response = await fetch(`http://localhost:3000/province?postCode=${zip}`);
+      const res = await fetch(`http://localhost:3000/province?postCode=${zip}`).catch((e) =>
+        console.error('Error: ', e),
+      );
 
-        if (response.ok) {
-          const newProvince = await response.json();
-          provinceSelected = newProvince[0].id;
-          districtSelected = '';
-          subDistrictSelected = '';
-        } else {
-          console.error('Failed to fetch province:', await response.text());
-        }
-      } catch (error) {
-        console.error('Error fetching data:', error);
+      if (!res) return;
+      if (!res.ok) return console.error('Failed to fetch province:', await res.text());
+
+      const newProvince = await res.json();
+
+      if (newProvince && newProvince.length > 0) {
+        provinceSelected = newProvince[0].id;
+        districtSelected = '';
+        subDistrictSelected = '';
+        villageSelected = '';
+      } else {
+        console.error('No province found for the given zip code.');
       }
     }
   }
 
   async function submit() {
-    try {
-      cart.order.village = villageSelected;
-      const response = await fetch('http://localhost:3000/order', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: cart.order.name,
-          qty: cart.order.qty,
-          coffeeId: cart.order.coffee.id,
-          villageId: cart.order.village,
-        }),
-      });
+    const res = await fetch('http://localhost:3000/order', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        name: cart.order.name,
+        qty: cart.order.qty,
+        coffeeId: cart.order.coffee.id,
+        villageId: villageSelected,
+      }),
+    }).catch((e) => console.error('Error: ', e));
 
-      if (response.ok) {
-        console.log('Order submitted successfully!');
-        window.location.href = '/status';
-      } else {
-        console.error('Failed to submit order:', await response.text());
-      }
-    } catch (error) {
-      console.error('Error:', error);
-    }
+    if (!res) return;
+    if (!res.ok) return console.error('Failed to submit order:', await res.text());
+
+    console.log('Order submitted successfully!');
+    window.location.href = '/status';
   }
 </script>
 
@@ -151,117 +148,126 @@
       <p class="text-xl font-medium">รายละเอียดการสั่งซื้อ</p>
       <p class="text-gray-400">ตรวจสอบรายละเอียดการสั่งซื้อให้ครบถ้วน</p>
       <div>
-        <label for="name" class="mt-4 mb-2 block text-sm font-medium">ชื่อ นามสกุล</label>
-        <div class="relative">
-          <input
-            type="text"
-            id="name"
-            name="name"
-            bind:value={cart.order.name}
-            class="w-full rounded-md border border-stone-200 px-4 py-3 pl-11 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
-            placeholder="นายกอไก่ ขอไข่"
-          />
-          <div class="pointer-events-none absolute inset-y-0 left-0 inline-flex items-center px-3">
-            <div class="i-mdi:account-circle-outline h-4 w-4 text-stone-400"></div>
-          </div>
-        </div>
-
-        <label for="address" class="mt-4 mb-2 block text-sm font-medium">ที่อยู่ในการจัดส่ง</label>
-        <div class="flex flex-col gap-y-2">
-          <div class="flex flex-row gap-x-2">
+        <form on:submit={submit}>
+          <label for="name" class="mt-4 mb-2 block text-sm font-medium">ชื่อ นามสกุล</label>
+          <div class="relative">
             <input
-              on:input={debounce}
+              required
               type="text"
-              name="address-zip"
-              maxlength="5"
-              class="w-2/6 rounded-md border border-stone-200 px-4 py-3 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
-              placeholder="รหัสไปรษณีย์"
+              id="name"
+              name="name"
+              bind:value={cart.order.name}
+              class="w-full rounded-md border border-stone-200 px-4 py-3 pl-11 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
+              placeholder="นายกอไก่ ขอไข่"
             />
-            <select
-              bind:value={provinceSelected}
-              name="address-province"
-              class="w-4/6 rounded-md border border-stone-200 px-4 py-3 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
+            <div
+              class="pointer-events-none absolute inset-y-0 left-0 inline-flex items-center px-3"
             >
-              <option selected disabled hidden value="">เลือกจังหวัด</option>
-              {#each provinceOption as province (province.id)}
-                <option
-                  value={province.id}
-                  selected={province.id === provinceSelected ? true : false}
-                >
-                  {province.name}
-                </option>
-              {/each}
-            </select>
+              <div class="i-mdi:account-circle-outline h-4 w-4 text-stone-400"></div>
+            </div>
           </div>
 
-          <div class="flex flex-row gap-x-2">
-            <select
-              bind:value={districtSelected}
-              name="address-district"
-              class="w-2/6 rounded-md border border-stone-200 px-4 py-3 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
-            >
-              <option selected disabled hidden value="">เลือกอำเภอ</option>
-              {#await districtOption() then options}
-                {#each options as district (district.id)}
-                  <option value={district.id}>{district.name}</option>
+          <label for="address" class="mt-4 mb-2 block text-sm font-medium">ที่อยู่ในการจัดส่ง</label
+          >
+          <div class="flex flex-col gap-y-2">
+            <div class="flex flex-row gap-x-2">
+              <input
+                required
+                on:input={debounce}
+                type="text"
+                name="address-zip"
+                maxlength="5"
+                class="w-2/6 rounded-md border border-stone-200 px-4 py-3 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
+                placeholder="รหัสไปรษณีย์"
+              />
+              <select
+                required
+                bind:value={provinceSelected}
+                name="address-province"
+                class="w-4/6 rounded-md border border-stone-200 px-4 py-3 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
+              >
+                <option selected disabled hidden value="">เลือกจังหวัด</option>
+                {#each provinceOption as province (province.id)}
+                  <option
+                    value={province.id}
+                    selected={province.id === provinceSelected ? true : false}
+                  >
+                    {province.name}
+                  </option>
                 {/each}
-              {/await}
-            </select>
+              </select>
+            </div>
 
-            <select
-              bind:value={subDistrictSelected}
-              name="address-subDistrict"
-              class="w-2/6 rounded-md border border-stone-200 px-4 py-3 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
-            >
-              <option selected disabled hidden value="">เลือกตำบล</option>
-              {#await subDistrictOption() then options}
-                {#each options as subDistrict (subDistrict.id)}
-                  <option value={subDistrict.id}>{subDistrict.name}</option>
-                {/each}
-              {/await}
-            </select>
+            <div class="flex flex-row gap-x-2">
+              <select
+                required
+                bind:value={districtSelected}
+                name="address-district"
+                class="w-2/6 rounded-md border border-stone-200 px-4 py-3 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
+              >
+                <option selected disabled hidden value="">เลือกอำเภอ</option>
+                {#await districtOption() then options}
+                  {#each options as district (district.id)}
+                    <option value={district.id}>{district.name}</option>
+                  {/each}
+                {/await}
+              </select>
 
-            <select
-              bind:value={villageSelected}
-              name="address-subDistrict"
-              class="w-2/6 rounded-md border border-stone-200 px-4 py-3 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
-            >
-              <option selected disabled hidden value="">เลือกหมู่บ้าน</option>
-              {#await villageOption() then options}
-                {#each options as village (village.id)}
-                  <option value={village.id}>{village.name}</option>
-                {/each}
-              {/await}
-            </select>
-          </div>
+              <select
+                required
+                bind:value={subDistrictSelected}
+                name="address-subDistrict"
+                class="w-2/6 rounded-md border border-stone-200 px-4 py-3 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
+              >
+                <option selected disabled hidden value="">เลือกตำบล</option>
+                {#await subDistrictOption() then options}
+                  {#each options as subDistrict (subDistrict.id)}
+                    <option value={subDistrict.id}>{subDistrict.name}</option>
+                  {/each}
+                {/await}
+              </select>
 
-          <!-- Total -->
-          <div class="mt-6 border-t border-b border-stone-200 py-2">
-            <div class="flex items-center justify-between">
-              <p class="text-sm font-medium text-stone-800">ราคารวม</p>
-              <p class="font-semibold text-stone-800">
-                ฿{cart.order.qty ? orderPrice : '0'}
+              <select
+                required
+                bind:value={villageSelected}
+                name="address-subDistrict"
+                class="w-2/6 rounded-md border border-stone-200 px-4 py-3 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
+              >
+                <option selected disabled hidden value="">เลือกหมู่บ้าน</option>
+                {#await villageOption() then options}
+                  {#each options as village (village.id)}
+                    <option value={village.id}>{village.name}</option>
+                  {/each}
+                {/await}
+              </select>
+            </div>
+
+            <!-- Total -->
+            <div class="mt-6 border-t border-b border-stone-200 py-2">
+              <div class="flex items-center justify-between">
+                <p class="text-sm font-medium text-stone-800">ราคารวม</p>
+                <p class="font-semibold text-stone-800">
+                  ฿{cart.order.qty ? orderPrice : '0'}
+                </p>
+              </div>
+              <div class="flex items-center justify-between">
+                <p class="text-sm font-medium text-stone-800">ค่าจัดส่ง</p>
+                <p class="font-semibold text-stone-800">฿{shippingPrice}</p>
+              </div>
+            </div>
+            <div class="mt-6 flex items-center justify-between">
+              <p class="text-sm font-medium text-stone-800">ราคาสุทธิ</p>
+              <p class="text-2xl font-semibold text-stone-800">
+                ฿{cart.order.qty ? totalPrice : '0'}
               </p>
             </div>
-            <div class="flex items-center justify-between">
-              <p class="text-sm font-medium text-stone-800">ค่าจัดส่ง</p>
-              <p class="font-semibold text-stone-800">฿{shippingPrice}</p>
-            </div>
           </div>
-          <div class="mt-6 flex items-center justify-between">
-            <p class="text-sm font-medium text-stone-800">ราคาสุทธิ</p>
-            <p class="text-2xl font-semibold text-stone-800">
-              ฿{cart.order.qty ? totalPrice : '0'}
-            </p>
-          </div>
-        </div>
-        <a
-          onclick={submit}
-          href={cart.order.qty ? '/status' : '/checkout'}
-          type="button"
-          class="cursor-pointer no-underline flex justify-center items-center mt-4 mb-8 w-full rounded-md bg-orange-900 hover:bg-orange-950 px-6 py-3 font-medium text-white"
-          >สั่งซื้อสินค้า</a
-        >
+          <button
+            type="submit"
+            class="cursor-pointer no-underline flex justify-center items-center mt-4 mb-8 w-full rounded-md bg-orange-900 hover:bg-orange-950 px-6 py-3 font-medium text-white"
+            >สั่งซื้อสินค้า</button
+          >
+        </form>
       </div>
     </div>
   </div>
