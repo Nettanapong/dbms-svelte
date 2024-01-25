@@ -3,11 +3,14 @@ import consola from "consola";
 import { Router, Status } from "@oakserver/oak";
 import { OrderStatus, PrismaClient } from "@prisma/client";
 import { ORDER_SELECT } from "../models/order";
+import useWebSocket from "../utils/websocket";
 
 const router = new Router();
 const prisma = new PrismaClient({
   errorFormat: "minimal",
 });
+
+const ws = useWebSocket();
 
 router.get("/order", async (ctx) => {
   const result = await prisma.order.findMany({
@@ -62,6 +65,8 @@ router.post("/order", async (ctx) => {
     });
   });
 
+  ws.io.emit("OrderRecieved");
+
   consola.success("Order Success");
   ctx.response.status = 204;
 });
@@ -96,6 +101,7 @@ router.post("/order/:id/cancel", async (ctx) => {
     });
   });
 
+  ws.io.emit("OrderCanceled");
   consola.success("Order Success");
   ctx.response.status = 204;
 });
