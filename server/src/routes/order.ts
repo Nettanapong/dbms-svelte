@@ -9,7 +9,6 @@ const prisma = new PrismaClient({
   errorFormat: "minimal",
 });
 
-// TODO: Implement Thai Village Database
 router.get("/order", async (ctx) => {
   const result = await prisma.order.findMany({
     select: ORDER_SELECT,
@@ -105,7 +104,7 @@ router.patch("/order/:id", async (ctx) => {
   const schema = z.object({
     id: z.string().length(12),
     status: z.nativeEnum(OrderStatus),
-    villageId: z.string().length(8),
+    villageId: z.string().length(8).optional(),
   });
   const validate = await schema.safeParseAsync(await ctx.request.body().value);
 
