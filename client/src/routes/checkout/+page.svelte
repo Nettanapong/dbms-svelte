@@ -20,17 +20,18 @@
   };
 
   let zip = $state('');
-  let home = $state('');
-
   let provinceSelected = $state('');
   let districtSelected = $state('');
   let subDistrictSelected = $state('');
+  let villageSelected = $state('');
 
   let provinceOption = data.province;
 
-  let districtOption = $derived(async () => {
-    if (provinceSelected.length > 0) {
-      const response = await fetch(`http://localhost:3000/district?provinceId=${provinceSelected}`);
+  let villageOption = $derived(async () => {
+    if (subDistrictSelected.length > 0) {
+      const response = await fetch(
+        `http://localhost:3000/village?provinceId=${provinceSelected}&districtId=${districtSelected}&subDistrictId=${subDistrictSelected}`,
+      );
       const districts = await response.json();
       return districts;
     } else {
@@ -50,19 +51,29 @@
     }
   });
 
+  let districtOption = $derived(async () => {
+    if (provinceSelected.length > 0) {
+      const response = await fetch(`http://localhost:3000/district?provinceId=${provinceSelected}`);
+      const districts = await response.json();
+      return districts;
+    } else {
+      return [];
+    }
+  });
+
   async function getProvince(zip: string) {
     if (zip.length === 5) {
       try {
         const response = await fetch(`http://localhost:3000/province?postCode=${zip}`);
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch province data');
+        if (response.ok) {
+          const newProvince = await response.json();
+          provinceSelected = newProvince[0].id;
+          districtSelected = '';
+          subDistrictSelected = '';
+        } else {
+          console.error('Failed to fetch province:', await response.text());
         }
-
-        const newProvince = await response.json();
-        provinceSelected = newProvince[0].id;
-        districtSelected = '';
-        subDistrictSelected = '';
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -70,15 +81,8 @@
   }
 
   async function submit() {
-    cart.order.address = `${home} ${subDistrictSelected} ${districtSelected} ${provinceSelected} ${zip}`;
-    // let order = {
-    //   name: cart.order.name,
-    //   address: cart.order.address,
-    //   qty: cart.order.qty,
-    //   coffeeId: cart.order.coffee.id,
-    // };
-    // console.log(order);
     try {
+      cart.order.village = villageSelected;
       const response = await fetch('http://localhost:3000/order', {
         method: 'POST',
         headers: {
@@ -86,19 +90,20 @@
         },
         body: JSON.stringify({
           name: cart.order.name,
-          address: cart.order.address,
           qty: cart.order.qty,
           coffeeId: cart.order.coffee.id,
+          villageId: cart.order.village,
         }),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to submit order');
+      if (response.ok) {
+        console.log('Order submitted successfully!');
+        window.location.href = '/status';
+      } else {
+        console.error('Failed to submit order:', await response.text());
       }
-
-      window.location.href = '/status';
     } catch (error) {
-      console.error('Error submitting order:', error);
+      console.error('Error:', error);
     }
   }
 </script>
@@ -172,20 +177,10 @@
               class="w-2/6 rounded-md border border-stone-200 px-4 py-3 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
               placeholder="รหัสไปรษณีย์"
             />
-            <input
-              bind:value={home}
-              type="text"
-              name="address-home"
-              class="w-4/6 rounded-md border border-stone-200 px-4 py-3 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
-              placeholder="บ้านเลขที่"
-            />
-          </div>
-
-          <div class="flex flex-row gap-x-2">
             <select
               bind:value={provinceSelected}
               name="address-province"
-              class="w-2/6 rounded-md border border-stone-200 px-4 py-3 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
+              class="w-4/6 rounded-md border border-stone-200 px-4 py-3 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
             >
               <option selected disabled hidden value="">เลือกจังหวัด</option>
               {#each provinceOption as province (province.id)}
@@ -197,7 +192,9 @@
                 </option>
               {/each}
             </select>
+          </div>
 
+          <div class="flex flex-row gap-x-2">
             <select
               bind:value={districtSelected}
               name="address-district"
@@ -220,6 +217,19 @@
               {#await subDistrictOption() then options}
                 {#each options as subDistrict (subDistrict.id)}
                   <option value={subDistrict.id}>{subDistrict.name}</option>
+                {/each}
+              {/await}
+            </select>
+
+            <select
+              bind:value={villageSelected}
+              name="address-subDistrict"
+              class="w-2/6 rounded-md border border-stone-200 px-4 py-3 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
+            >
+              <option selected disabled hidden value="">เลือกหมู่บ้าน</option>
+              {#await villageOption() then options}
+                {#each options as village (village.id)}
+                  <option value={village.id}>{village.name}</option>
                 {/each}
               {/await}
             </select>

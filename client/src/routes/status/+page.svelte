@@ -22,17 +22,25 @@
           </tr>
         </thead>
         <tbody>
-          {#each data.order as order}
+          {#if data.order.length > 0}
+            {#each data.order as order}
+              <tr class="bg-white border-t border-stone-200 hover:bg-stone-50">
+                <th scope="row" class="px-6 py-4 font-medium text-stone-900 whitespace-nowrap">
+                  {order.name}
+                </th>
+                <td class="px-6 py-4"> {order.village} </td>
+                <td class="px-6 py-4"> {order.coffee.name} </td>
+                <td class="px-6 py-4"> {order.qty} </td>
+                <td class="px-6 py-4"> {order.status} </td>
+              </tr>
+            {/each}
+          {:else}
             <tr class="bg-white border-t border-stone-200 hover:bg-stone-50">
-              <th scope="row" class="px-6 py-4 font-medium text-stone-900 whitespace-nowrap">
-                {order.name}
-              </th>
-              <td class="px-6 py-4"> {order.address} </td>
-              <td class="px-6 py-4"> {order.coffee.name} </td>
-              <td class="px-6 py-4"> {order.qty} </td>
-              <td class="px-6 py-4"> {order.status} </td>
+              <td colspan="5" class="px-6 py-4 text-center font-medium whitespace-nowrap"
+                >ยังไม่มีข้อมูล</td
+              >
             </tr>
-          {/each}
+          {/if}
         </tbody>
       </table>
     </div>
