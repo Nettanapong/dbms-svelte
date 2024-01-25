@@ -2,8 +2,9 @@
   import { fade } from 'svelte/transition';
   import classes from 'svelte-transition-classes';
 
-  let { action, id, name, stock, maxOrder, roastedLevel, price, type } = $props<{
+  let { action, onAction, id, name, stock, maxOrder, roastedLevel, price, type } = $props<{
     action: 'add' | 'edit';
+    onAction: Function;
     id?: string;
     name?: string;
     stock?: number;
@@ -16,9 +17,9 @@
   let open = $state<boolean>(false);
 
   async function submit() {
-    if (action === 'add') {
-      try {
-        const response = await fetch('http://localhost:3000/coffee', {
+    switch (action) {
+      case 'add': {
+        const res = await fetch('http://localhost:3000/coffee', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -31,19 +32,18 @@
             price: price,
             type: type,
           }),
-        });
-        if (response.ok) {
-          open = false;
-          console.log('Coffee added successfully!');
-        } else {
-          console.error('Failed to add coffee:', await response.text());
-        }
-      } catch (error) {
-        console.error('Error:', error);
+        }).catch((e) => console.error('Error: ', e));
+
+        if (!res) return;
+        if (!res.ok) return console.error('Failed to add coffee: ', await res.text());
+
+        console.log('Coffee added successfully!');
+        onAction();
+        open = false;
+        break;
       }
-    } else {
-      try {
-        const response = await fetch(`http://localhost:3000/coffee/${id}`, {
+      case 'edit': {
+        const res = await fetch(`http://localhost:3000/coffee/${id}`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
@@ -56,15 +56,15 @@
             price: price,
             type: type,
           }),
-        });
+        }).catch((e) => console.error('Error: ', e));
 
-        if (!response.ok) {
-          throw new Error(`Failed to update coffee. Status: ${response.status}`);
-        } else {
-          console.error('Failed to add coffee:', await response.text());
-        }
-      } catch (error) {
-        console.error('Error:', error);
+        if (!res) return;
+        if (!res.ok) return console.error('Failed to edit coffee: ', await res.text());
+
+        console.log('Coffee editted successfully!');
+        onAction();
+        open = false;
+        break;
       }
     }
   }
@@ -93,7 +93,7 @@
     transition:fade={{ duration: 200 }}
   >
     <div
-      class="relative p-4 w-2/6 max-h-full"
+      class="relative p-4 w-auto max-h-full"
       in:classes={{
         duration: 200,
         base: 'ease-out duration-200',
@@ -124,11 +124,12 @@
           </span>
         </div>
         <!-- Modal body -->
-        <div class="px-4 py-6 flex flex-col gap-y-6">
+        <form class="px-4 py-4 flex flex-col gap-6" on:submit={submit}>
           <div>
             <label for="name" class="block mb-2 text-sm font-medium">ชื่อ</label>
             <div class="relative">
               <input
+                required
                 bind:value={name}
                 type="text"
                 id="name"
@@ -143,6 +144,7 @@
             <label for="type" class="block mb-2 text-sm font-medium">ประเภท</label>
             <div class="relative">
               <input
+                required
                 bind:value={type}
                 type="text"
                 id="type"
@@ -158,6 +160,7 @@
               <label for="roastedLevel" class="block mb-2 text-sm font-medium">ระดับการคั่ว</label>
               <div class="relative">
                 <input
+                  required
                   bind:value={roastedLevel}
                   type="number"
                   id="roastedLevel"
@@ -172,6 +175,7 @@
               <label for="stock" class="block mb-2 text-sm font-medium">ขนาดคงเหลือ</label>
               <div class="relative">
                 <input
+                  required
                   bind:value={stock}
                   type="number"
                   id="stock"
@@ -190,6 +194,7 @@
               >
               <div class="relative">
                 <input
+                  required
                   bind:value={maxOrder}
                   type="number"
                   id="maxOrder"
@@ -204,6 +209,7 @@
               <label for="price" class="block mb-2 text-sm font-medium">ราคา</label>
               <div class="relative">
                 <input
+                  required
                   bind:value={price}
                   type="number"
                   id="price"
@@ -214,22 +220,22 @@
               </div>
             </div>
           </div>
-        </div>
-        <!-- Modal footer -->
-        <div class="p-4 mt-2 flex flex-row justify-end gap-x-4">
-          <button
-            onclick={() => (open = false)}
-            class="cursor-pointer rounded-md px-4 py-2 mb-4 flex items-center text-sm text-blue-500 border border-blue-500 bg-transparent hover:bg-blue-100"
-          >
-            ยกเลิก
-          </button>
-          <button
-            onclick={submit}
-            class="cursor-pointer rounded-md px-4 py-2 mb-4 flex items-center text-sm text-white bg-blue-500 hover:bg-blue-400"
-          >
-            ยืนยัน
-          </button>
-        </div>
+          <div class="p-4 mt-4 flex flex-row justify-end gap-x-4">
+            <button
+              type="button"
+              onclick={() => (open = false)}
+              class="cursor-pointer rounded-md px-4 py-2 mb-4 flex items-center text-sm text-blue-500 border border-blue-500 bg-transparent hover:bg-blue-100"
+            >
+              ยกเลิก
+            </button>
+            <button
+              type="submit"
+              class="cursor-pointer rounded-md px-4 py-2 mb-4 flex items-center text-sm text-white bg-blue-500 hover:bg-blue-400"
+            >
+              ยืนยัน
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   </div>

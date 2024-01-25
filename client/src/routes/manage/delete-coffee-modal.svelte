@@ -9,24 +9,21 @@
   let open = $state<boolean>(false);
 
   async function submit() {
-    try {
-      const response = await fetch(`http://localhost:3000/coffee/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+    const res = await fetch(`http://localhost:3000/coffee/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).catch((e) => {
+      console.error('Error: ', e);
+      return new Response(null, { status: 500 });
+    });
 
-      if (response.status === 204) {
-        console.log('Delete Success');
-        open = false;
-        onDelete();
-      } else {
-        console.error('Delete failed');
-      }
-    } catch (error) {
-      console.error('Error deleting coffee:', error);
-    }
+    if (res.status !== 204) return console.error('Delete failed');
+
+    console.log('Delete Success');
+    open = false;
+    onDelete();
   }
 </script>
 
