@@ -2,24 +2,15 @@
   import { fade } from 'svelte/transition';
   import classes from 'svelte-transition-classes';
 
-  let {
-    action,
-    id = '',
-    name = '',
-    stock = 0,
-    maxOrder = 0,
-    roastedLevel = 0,
-    price = 0,
-    type = '',
-  } = $props<{
-    action: string;
-    id: string;
-    name: string;
-    stock: number;
-    maxOrder: number;
-    roastedLevel: number;
-    price: number;
-    type: string;
+  let { action, id, name, stock, maxOrder, roastedLevel, price, type } = $props<{
+    action: 'add' | 'edit';
+    id?: string;
+    name?: string;
+    stock?: number;
+    maxOrder?: number;
+    roastedLevel?: number;
+    price?: number;
+    type?: string;
   }>();
 
   let open = $state<boolean>(false);
@@ -37,11 +28,12 @@
             stock: stock,
             maxOrder: maxOrder,
             roastedLevel: roastedLevel,
-            // price: price,
+            price: price,
             type: type,
           }),
         });
         if (response.ok) {
+          open = false;
           console.log('Coffee added successfully!');
         } else {
           console.error('Failed to add coffee:', await response.text());
@@ -61,7 +53,7 @@
             stock: stock,
             maxOrder: maxOrder,
             roastedLevel: roastedLevel,
-            // price: price,
+            price: price,
             type: type,
           }),
         });
@@ -167,7 +159,7 @@
               <div class="relative">
                 <input
                   bind:value={roastedLevel}
-                  type="text"
+                  type="number"
                   id="roastedLevel"
                   name="roastedLevel"
                   class="w-full rounded-md border border-stone-200 px-4 py-3 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
@@ -181,7 +173,7 @@
               <div class="relative">
                 <input
                   bind:value={stock}
-                  type="text"
+                  type="number"
                   id="stock"
                   name="stock"
                   class="w-full rounded-md border border-stone-200 px-4 py-3 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
@@ -199,7 +191,7 @@
               <div class="relative">
                 <input
                   bind:value={maxOrder}
-                  type="text"
+                  type="number"
                   id="maxOrder"
                   name="maxOrder"
                   class="w-full rounded-md border border-stone-200 px-4 py-3 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
@@ -213,7 +205,7 @@
               <div class="relative">
                 <input
                   bind:value={price}
-                  type="text"
+                  type="number"
                   id="price"
                   name="price"
                   class="w-full rounded-md border border-stone-200 px-4 py-3 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
