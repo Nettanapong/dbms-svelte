@@ -118,9 +118,41 @@ router.patch("/order/:id", async (ctx) => {
 
   const { id, ...data } = validate.data;
 
-  const updated = await prisma.order.updateMany({ data, where: { id } });
+  const status = Object.values(OrderStatus);
+  const record = await prisma.order.findUnique({ where: { id } });
 
-  if (!updated.count) ctx.throw(Status.NotFound);
+  if (record && status.indexOf(data.status) <= status.indexOf(record.status)) {
+    ctx.throw(Status.Forbidden, "Cannot Reverse Status");
+  }
+  if (data.status === "CANCELED") {
+    await prisma.$transaction(async (tx) => {
+      const order = await tx.order.findUnique({
+        where: { id: validate.data.id },
+      });
+
+      if (!order) return ctx.throw(Status.NotFound);
+
+      if (order.status !== OrderStatus.PENDING) {
+        return ctx.throw(Status.NotAcceptable, "Too Late");
+      }
+
+      await tx.order.update({
+        data: { status: OrderStatus.CANCELED },
+        where: { id: validate.data.id },
+      });
+
+      await tx.coffee.update({
+        data: {
+          stock: { increment: order.qty },
+        },
+        where: { id: order.coffeeId },
+      });
+    });
+  } else {
+    const updated = await prisma.order.updateMany({ data, where: { id } });
+
+    if (!updated.count) ctx.throw(Status.NotFound);
+  }
 
   consola.success("Update Success");
   ctx.response.status = 204;
