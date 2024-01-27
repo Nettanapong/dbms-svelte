@@ -12,11 +12,14 @@
 
   const { children } = $props();
 
-  let cartState = $state<boolean>(false);
+  let cartState = $state(false);
+  let authState = $state(false);
 </script>
 
 <article class=":uno: font-sans">
-  <nav class="bg-white shadow-lg flex justify-between px-4 py-2 items-center">
+  <nav
+    class="bg-white shadow-lg flex justify-between px-4 py-2 items-center w-full z-100 sticky top-0"
+  >
     <a href="/" class="flex items-center space-x-4 no-underline">
       <img src={Logo} class="h-10" alt="Coffee Logo" />
       <span class="text-3xl font-bold text-stone-800">C O F F E E</span>
@@ -44,11 +47,21 @@
             </span>
           </a>
         </li>
-        <li class="flex items-center"><AuthModal /></li>
+        <li class="flex items-center">
+          <button onclick={() => (authState = true)} class="cursor-pointer bg-white">
+            <div
+              class="i-mdi:account-circle-outline h-8 w-8 hover:text-orange-800 transition duration-100"
+            ></div>
+          </button>
+        </li>
       </ul>
     </div>
   </nav>
+
   {@render children()}
+
+  <Cart bind:open={cartState} />
+  <AuthModal bind:open={authState} />
 </article>
 
 <button
@@ -57,5 +70,3 @@
 >
   <div class="i-mdi:cart-outline h-8 w-8 text-orange-800 transition duration-100"></div>
 </button>
-
-<Cart bind:open={cartState} />

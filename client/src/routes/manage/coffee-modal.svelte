@@ -2,22 +2,35 @@
   import { fade } from 'svelte/transition';
   import classes from 'svelte-transition-classes';
 
-  let { action, onAction, id, name, stock, maxOrder, roastedLevel, price, type } = $props<{
-    action: 'add' | 'edit';
+  type ActionAdd = {
+    action: 'add';
     onAction: Function;
-    id?: string;
+  };
+
+  type ActionEdit = {
+    action: 'edit';
+    onAction: Function;
+    id: string;
     name?: string;
     stock?: number;
     maxOrder?: number;
     roastedLevel?: number;
     price?: number;
     type?: string;
-  }>();
+  };
 
+  let { ...props } = $props<ActionAdd | ActionEdit>();
+
+  let name = $state((props.action === 'edit' && props.name) || '');
+  let stock = $state((props.action === 'edit' && props.stock) || 0);
+  let maxOrder = $state((props.action === 'edit' && props.maxOrder) || 1);
+  let roastedLevel = $state((props.action === 'edit' && props.roastedLevel) || 0);
+  let price = $state((props.action === 'edit' && props.price) || 0);
+  let type = $state((props.action === 'edit' && props.type) || '');
   let open = $state<boolean>(false);
 
   async function submit() {
-    switch (action) {
+    switch (props.action) {
       case 'add': {
         const res = await fetch('http://localhost:3000/coffee', {
           method: 'POST',
@@ -25,12 +38,13 @@
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            name: name,
-            stock: stock,
-            maxOrder: maxOrder,
-            roastedLevel: roastedLevel,
-            price: price,
-            type: type,
+            name,
+            stock,
+            maxOrder,
+            roastedLevel,
+            price,
+            type,
+            open,
           }),
         }).catch((e) => console.error('Error: ', e));
 
@@ -38,23 +52,24 @@
         if (!res.ok) return console.error('Failed to add coffee: ', await res.text());
 
         console.log('Coffee added successfully!');
-        onAction();
+        props.onAction();
         open = false;
         break;
       }
       case 'edit': {
-        const res = await fetch(`http://localhost:3000/coffee/${id}`, {
+        const res = await fetch(`http://localhost:3000/coffee/${props.id}`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            name: name,
-            stock: stock,
-            maxOrder: maxOrder,
-            roastedLevel: roastedLevel,
-            price: price,
-            type: type,
+            name,
+            stock,
+            maxOrder,
+            roastedLevel,
+            price,
+            type,
+            open,
           }),
         }).catch((e) => console.error('Error: ', e));
 
@@ -62,7 +77,7 @@
         if (!res.ok) return console.error('Failed to edit coffee: ', await res.text());
 
         console.log('Coffee editted successfully!');
-        onAction();
+        props.onAction();
         open = false;
         break;
       }
@@ -70,7 +85,7 @@
   }
 </script>
 
-{#if action === 'add'}
+{#if props.action === 'add'}
   <button
     onclick={() => (open = true)}
     class="cursor-pointer rounded-md px-4 py-2 mb-4 flex items-center shadow-md text-sm text-white bg-blue-500 hover:bg-blue-400"
@@ -79,7 +94,7 @@
   </button>
 {/if}
 
-{#if action === 'edit'}
+{#if props.action === 'edit'}
   <button onclick={() => (open = true)} class="bg-transparent cursor-pointer p-2"
     ><div class="i-mdi:pencil-outline h-6 w-6 text-stone-400 hover:text-blue" /></button
   >
@@ -120,11 +135,11 @@
         </div>
         <div class="px-4 pb-4 flex flex-row justify-center">
           <span class="text-xl font-semibold text-stone-900">
-            {action === 'add' ? 'เพิ่มสินค้า' : 'แก้ไขสินค้า'}
+            {props.action === 'add' ? 'เพิ่มสินค้า' : 'แก้ไขสินค้า'}
           </span>
         </div>
         <!-- Modal body -->
-        <form class="px-4 py-4 flex flex-col gap-6" on:submit={submit}>
+        <form class="px-4 py-4 flex flex-col gap-6" onsubmit={submit}>
           <div>
             <label for="name" class="block mb-2 text-sm font-medium">ชื่อ</label>
             <div class="relative">

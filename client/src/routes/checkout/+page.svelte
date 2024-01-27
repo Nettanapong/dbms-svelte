@@ -1,11 +1,16 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
   import { debounce } from '$lib';
   import useCart from '$lib/stores/product.svelte';
   import ProductImage from '$lib/assets/product.png';
-  import { goto } from '$app/navigation';
+  import { onMount } from 'svelte';
 
   let { data } = $props();
   const cart = useCart();
+
+  onMount(() => {
+    console.log(cart.order);
+  });
 
   let orderPrice = Number(cart.order.coffee?.price) * Number(cart.order.qty);
   let shippingPrice = 0;
@@ -55,6 +60,9 @@
   async function getProvince(zip: string) {
     if (zip.length === 5) {
       provinceSelected = data.province.find((v) => v.id.slice(0, 2) === zip.slice(0, 2))?.id || '';
+      districtSelected = '';
+      subDistrictSelected = '';
+      villageSelected = '';
     }
   }
 
@@ -176,6 +184,7 @@
               <select
                 required
                 bind:value={districtSelected}
+                disabled={provinceSelected.length === 0}
                 name="address-district"
                 class="w-2/6 rounded-md border border-stone-200 px-4 py-3 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
               >
@@ -190,6 +199,7 @@
               <select
                 required
                 bind:value={subDistrictSelected}
+                disabled={districtSelected.length === 0}
                 name="address-sub-district"
                 class="w-2/6 rounded-md border border-stone-200 px-4 py-3 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
               >
@@ -204,6 +214,7 @@
               <select
                 required
                 bind:value={villageSelected}
+                disabled={subDistrictSelected.length === 0}
                 name="address-sub-district"
                 class="w-2/6 rounded-md border border-stone-200 px-4 py-3 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
               >

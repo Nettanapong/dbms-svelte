@@ -78,8 +78,14 @@
                     name="order-status"
                     class="w-full rounded-md border border-stone-200 px-4 py-3 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
                   >
-                    {#each statusOption as status (status)}
-                      <option value={status} selected={status === item.status ? true : false}>
+                    {#each statusOption as status, idx (status)}
+                      <option
+                        value={status}
+                        selected={status === item.status ? true : false}
+                        class="disabled:(text-gray-300 bg-gray-100) p-4"
+                        disabled={idx < statusOption.indexOf(item.status) ||
+                          (status === 'CANCELED' && statusOption.indexOf(item.status) > 0)}
+                      >
                         {status}
                       </option>
                     {/each}

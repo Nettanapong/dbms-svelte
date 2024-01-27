@@ -2,21 +2,15 @@
   import { fade } from 'svelte/transition';
   import classes from 'svelte-transition-classes';
 
-  let open = $state<boolean>(false);
-  let register = $state<boolean>(false);
-</script>
+  let { open } = $props<{ open: boolean }>();
 
-<button onclick={() => (open = true)} class="cursor-pointer bg-white">
-  <div
-    class="i-mdi:account-circle-outline h-8 w-8 hover:text-orange-800 transition duration-100"
-  ></div>
-</button>
+  let register = $state(false);
+</script>
 
 {#if open}
   <!-- Overlay -->
   <div
-    style="z-index: 1;"
-    class="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-800 bg-opacity-50"
+    class="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-800 bg-opacity-50 z-100"
     transition:fade={{ duration: 300 }}
   >
     <div

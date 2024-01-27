@@ -7,6 +7,23 @@
   border-color: currentColor;
 }
 
+html {
+  overflow: auto;
+  scrollbar-gutter: stable;
+}
+
+::-webkit-scrollbar {
+  width: 0.5rem;
+  height: 0.5rem;
+}
+
+::-webkit-scrollbar-thumb {
+  border: 0.15rem solid rgba(0, 0, 0, 0);
+  background-color: hsla(0, 0%, 50%, 0.75);
+  background-clip: padding-box;
+  border-radius: 0.5rem;
+}
+
 button,
 input,
 optgroup,
