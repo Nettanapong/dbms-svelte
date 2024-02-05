@@ -29,7 +29,9 @@
   let type = $state((props.action === 'edit' && props.type) || '');
   let open = $state<boolean>(false);
 
-  async function submit() {
+  async function submit(e: SubmitEvent) {
+    e.preventDefault();
+
     switch (props.action) {
       case 'add': {
         const res = await fetch('http://localhost:3000/coffee', {
