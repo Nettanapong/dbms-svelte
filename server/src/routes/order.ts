@@ -51,18 +51,7 @@ router.post("/order", async (ctx) => {
 
   // prevent racing condition - do transaction
   await prisma.$transaction(async (tx) => {
-    const coffee = await tx.coffee.update({
-      data: {
-        stock: { decrement: validate.data.qty },
-      },
-      where: { id: validate.data.coffeeId },
-    });
-
-    if (coffee.stock < 0) return ctx.throw(Status.NotAcceptable, "Not Enough Quantity");
-
-    await tx.order.create({
-      data: { ...validate.data, status: OrderStatus.PENDING },
-    });
+    // implement transaction
   });
 
   ws.io.emit("OrderReceived");

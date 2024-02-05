@@ -10,18 +10,7 @@
   let open = $state<boolean>(false);
 
   async function submit() {
-    const res = await fetch(`${env.PUBLIC_BACKEND_URL}/coffee/${id}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }).catch((e) => {
-      console.error('Error: ', e);
-      return new Response(null, { status: 500 });
-    });
-
-    if (res.status !== 204) return console.error('Delete failed');
-
+    // send request to backend to delete data using id
     console.log('Delete Success');
     open = false;
     onDelete();

@@ -51,13 +51,9 @@ router.post("/coffee", async (ctx) => {
 
   if (!validate.success) return ctx.throw(Status.UnprocessableEntity, "Invalid Body");
   if (!Array.isArray(validate.data)) {
-    await prisma.coffee.create({
-      data: validate.data,
-    });
+    // Add data to database
   } else {
-    await prisma.coffee.createMany({
-      data: validate.data,
-    });
+    // Add multiple data to database
   }
 
   consola.success("Insert Success");

@@ -35,50 +35,14 @@
 
     switch (props.action) {
       case 'add': {
-        const res = await fetch(`${env.PUBLIC_BACKEND_URL}/coffee`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            name,
-            stock,
-            maxOrder,
-            roastedLevel,
-            price,
-            type,
-            open,
-          }),
-        }).catch((e) => console.error('Error: ', e));
-
-        if (!res) return;
-        if (!res.ok) return console.error('Failed to add coffee: ', await res.text());
-
+        // send request to backend to add data
         console.log('Coffee added successfully!');
         props.onAction();
         open = false;
         break;
       }
       case 'edit': {
-        const res = await fetch(`${env.PUBLIC_BACKEND_URL}/coffee/${props.id}`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            name,
-            stock,
-            maxOrder,
-            roastedLevel,
-            price,
-            type,
-            open,
-          }),
-        }).catch((e) => console.error('Error: ', e));
-
-        if (!res) return;
-        if (!res.ok) return console.error('Failed to edit coffee: ', await res.text());
-
+        // send request to backend to update data
         console.log('Coffee editted successfully!');
         props.onAction();
         open = false;
