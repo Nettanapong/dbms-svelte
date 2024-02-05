@@ -15,6 +15,7 @@
     "@iconify-json/logos": "^1.1.42",
     "@iconify-json/mdi": "^1.1.64",
     "@sveltejs/adapter-auto": "^3.1.0",
+    "@sveltejs/adapter-static": "^3.0.1",
     "@sveltejs/kit": "^2.4.0",
     "@sveltejs/vite-plugin-svelte": "^3.0.1",
     "@unocss/extractor-svelte": "^0.58.3",

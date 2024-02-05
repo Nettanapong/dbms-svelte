@@ -4,11 +4,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-dependencies:
-  svelte-transition-classes:
-    specifier: ^0.1.1
-    version: 0.1.1
-
 devDependencies:
   '@iconify-json/logos':
     specifier: ^1.1.42
@@ -19,6 +14,9 @@ devDependencies:
   '@sveltejs/adapter-auto':
     specifier: ^3.1.0
     version: 3.1.0(@sveltejs/kit@2.4.0)
+  '@sveltejs/adapter-static':
+    specifier: ^3.0.1
+    version: 3.0.1(@sveltejs/kit@2.4.0)
   '@sveltejs/kit':
     specifier: ^2.4.0
     version: 2.4.0(@sveltejs/vite-plugin-svelte@3.0.1)(svelte@5.0.0-next.37)(vite@5.0.12)
@@ -46,6 +44,9 @@ devDependencies:
   svelte-check:
     specifier: ^3.6.3
     version: 3.6.3(@babel/core@7.23.7)(postcss@8.4.33)(svelte@5.0.0-next.37)
+  svelte-transition-classes:
+    specifier: ^0.1.1
+    version: 0.1.1
   tslib:
     specifier: ^2.6.2
     version: 2.6.2
@@ -816,6 +817,14 @@ packages:
     dependencies:
       '@sveltejs/kit': 2.4.0(@sveltejs/vite-plugin-svelte@3.0.1)(svelte@5.0.0-next.37)(vite@5.0.12)
       import-meta-resolve: 4.0.0
+    dev: true
+
+  /@sveltejs/adapter-static@3.0.1(@sveltejs/kit@2.4.0):
+    resolution: {integrity: sha512-6lMvf7xYEJ+oGeR5L8DFJJrowkefTK6ZgA4JiMqoClMkKq0s6yvsd3FZfCFvX1fQ0tpCD7fkuRVHsnUVgsHyNg==}
+    peerDependencies:
+      '@sveltejs/kit': ^2.0.0
+    dependencies:
+      '@sveltejs/kit': 2.4.0(@sveltejs/vite-plugin-svelte@3.0.1)(svelte@5.0.0-next.37)(vite@5.0.12)
     dev: true
 
   /@sveltejs/kit@2.4.0(@sveltejs/vite-plugin-svelte@3.0.1)(svelte@5.0.0-next.37)(vite@5.0.12):
@@ -2105,7 +2114,7 @@ packages:
 
   /svelte-transition-classes@0.1.1:
     resolution: {integrity: sha512-LVQt9X8YlABH4N5iNtlXyYfN/pK8Yp8/Oy8Gx48j9kpCfv8F0HuXFcx2U4AzB7UuxTniYGEdqoV3q1c/ya4I7w==}
-    dev: false
+    dev: true
 
   /svelte@5.0.0-next.37:
     resolution: {integrity: sha512-gCBx4RRr4yVghb2Y5mVcsjUF7BAgy4a9vDW+K7NnRdIpm9JZLSNCejrjUImW+px9HE7xysKQf0iW7GuDtnGO5w==}
