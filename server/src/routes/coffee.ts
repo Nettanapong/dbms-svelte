@@ -50,7 +50,9 @@ router.post("/coffee", async (ctx) => {
   const validate = await schema.safeParseAsync(payload);
 
   if (!validate.success) return ctx.throw(Status.UnprocessableEntity, "Invalid Body");
-  if (!Array.isArray(validate.data)) {
+
+  // check if input is array or not
+  if (true || false) {
     // Add data to database
   } else {
     // Add multiple data to database
