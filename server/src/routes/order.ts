@@ -58,7 +58,7 @@ router.post("/order", async (ctx) => {
       where: { id: validate.data.coffeeId },
     });
 
-    if (coffee.stock < 0) return ctx.throw(Status.NotAcceptable, "Not Enough Quatity");
+    if (coffee.stock < 0) return ctx.throw(Status.NotAcceptable, "Not Enough Quantity");
 
     await tx.order.create({
       data: { ...validate.data, status: OrderStatus.PENDING },
