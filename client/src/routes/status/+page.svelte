@@ -1,5 +1,6 @@
 <script lang="ts">
   import { invalidateAll } from '$app/navigation';
+  import { env } from '$env/dynamic/public';
   import { OrderStatus } from '$lib/types.js';
   import { io } from 'socket.io-client';
 
@@ -9,7 +10,7 @@
   let statusOption = Object.values(OrderStatus);
 
   $effect(() => {
-    const socket = io('http://localhost:3001');
+    const socket = io(`${env.PUBLIC_SOCKET_URL}`);
 
     socket.on('OrderReceived', invalidateAll);
     socket.on('OrderCanceled', invalidateAll);
@@ -19,7 +20,7 @@
   });
 
   async function changeStatus(id: string, status: OrderStatus) {
-    const res = await fetch(`http://localhost:3000/order/${id}`, {
+    const res = await fetch(`${env.PUBLIC_BACKEND_URL}/order/${id}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -90,7 +91,6 @@
                       </option>
                     {/each}
                   </select>
-                  {console.log(item.status)}
                 </td>
               </tr>
             {/each}

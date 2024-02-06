@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { env } from '$env/dynamic/public';
   import { fade } from 'svelte/transition';
   import classes from 'svelte-transition-classes';
 
@@ -34,7 +35,7 @@
 
     switch (props.action) {
       case 'add': {
-        const res = await fetch('http://localhost:3000/coffee', {
+        const res = await fetch(`${env.PUBLIC_BACKEND_URL}/coffee`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -59,7 +60,7 @@
         break;
       }
       case 'edit': {
-        const res = await fetch(`http://localhost:3000/coffee/${props.id}`, {
+        const res = await fetch(`${env.PUBLIC_BACKEND_URL}/coffee/${props.id}`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',

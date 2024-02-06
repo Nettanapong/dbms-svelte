@@ -1,6 +1,7 @@
 <script lang="ts">
   import { fade } from 'svelte/transition';
   import classes from 'svelte-transition-classes';
+  import { env } from '$env/dynamic/public';
 
   let { id, onDelete } = $props<{
     id: string;
@@ -9,7 +10,7 @@
   let open = $state<boolean>(false);
 
   async function submit() {
-    const res = await fetch(`http://localhost:3000/coffee/${id}`, {
+    const res = await fetch(`${env.PUBLIC_BACKEND_URL}/coffee/${id}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',

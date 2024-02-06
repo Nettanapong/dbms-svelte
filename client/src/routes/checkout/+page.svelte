@@ -4,6 +4,7 @@
   import useCart from '$lib/stores/product.svelte';
   import ProductImage from '$lib/assets/product.png';
   import { onMount } from 'svelte';
+  import { env } from '$env/dynamic/public';
 
   let { data } = $props();
   const cart = useCart();
@@ -27,7 +28,7 @@
     (async () => {
       if (subDistrictSelected.length > 0) {
         const res = await fetch(
-          `http://localhost:3000/village?provinceId=${provinceSelected}&districtId=${districtSelected}&subDistrictId=${subDistrictSelected}`,
+          `${env.PUBLIC_BACKEND_URL}/village?provinceId=${provinceSelected}&districtId=${districtSelected}&subDistrictId=${subDistrictSelected}`,
         );
         return await res.json();
       }
@@ -39,7 +40,7 @@
     (async () => {
       if (districtSelected.length > 0) {
         const res = await fetch(
-          `http://localhost:3000/sub-district?provinceId=${provinceSelected}&districtId=${districtSelected}`,
+          `${env.PUBLIC_BACKEND_URL}/sub-district?provinceId=${provinceSelected}&districtId=${districtSelected}`,
         );
         return await res.json();
       }
@@ -50,7 +51,9 @@
   let districtOption = $derived(
     (async () => {
       if (provinceSelected.length > 0) {
-        const res = await fetch(`http://localhost:3000/district?provinceId=${provinceSelected}`);
+        const res = await fetch(
+          `${env.PUBLIC_BACKEND_URL}/district?provinceId=${provinceSelected}`,
+        );
         return await res.json();
       }
       return [];
@@ -69,7 +72,7 @@
   async function submit(e: SubmitEvent) {
     e.preventDefault();
 
-    const res = await fetch('http://localhost:3000/order', {
+    const res = await fetch(`${env.PUBLIC_BACKEND_URL}/order`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
