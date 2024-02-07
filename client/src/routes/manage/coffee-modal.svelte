@@ -30,7 +30,10 @@
   let type = '';
   let open = $state<boolean>(false);
 
-  $effect(() => {
+  $inspect(stock);
+
+  async function submit(e: SubmitEvent) {
+    e.preventDefault();
     console.log(
       `name: ${name}\n`,
       `stock: ${stock}\n`,
@@ -40,10 +43,6 @@
       `type: ${type}\n`,
       `open: ${open}\n`,
     );
-  });
-
-  async function submit(e: SubmitEvent) {
-    e.preventDefault();
 
     switch (props.action) {
       case 'add': {
