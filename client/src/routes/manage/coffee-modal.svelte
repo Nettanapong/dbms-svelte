@@ -23,12 +23,24 @@
   let { ...props } = $props<ActionAdd | ActionEdit>();
 
   let name = $state((props.action === 'edit' && props.name) || '');
-  let stock = ; // number
-  let maxOrder = ; // number
-  let roastedLevel = ; // number
-  let price = ; // number
-  let type = ; // string
+  let stock = 0;
+  let maxOrder = 0;
+  let roastedLevel = 0;
+  let price = 0;
+  let type = '';
   let open = $state<boolean>(false);
+
+  $effect(() => {
+    console.log(
+      `name: ${name}\n`,
+      `stock: ${stock}\n`,
+      `maxOrder: ${maxOrder}\n`,
+      `roastedLevel: ${roastedLevel}\n`,
+      `price: ${price}\n`,
+      `type: ${type}\n`,
+      `open: ${open}\n`,
+    );
+  });
 
   async function submit(e: SubmitEvent) {
     e.preventDefault();
