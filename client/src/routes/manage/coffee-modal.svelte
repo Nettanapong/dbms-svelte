@@ -23,11 +23,11 @@
   let { ...props } = $props<ActionAdd | ActionEdit>();
 
   let name = $state((props.action === 'edit' && props.name) || '');
-  let stock = $state((props.action === 'edit' && props.stock) || 0);
-  let maxOrder = $state((props.action === 'edit' && props.maxOrder) || 1);
-  let roastedLevel = $state((props.action === 'edit' && props.roastedLevel) || 0);
-  let price = $state((props.action === 'edit' && props.price) || 0);
-  let type = $state((props.action === 'edit' && props.type) || '');
+  let stock = $state<number>();
+  let maxOrder = $state<number>();
+  let roastedLevel = $state<number>();
+  let price = $state<number>();
+  let type = $state<string>();
   let open = $state<boolean>(false);
 
   async function submit(e: SubmitEvent) {
