@@ -23,11 +23,11 @@
   let { ...props } = $props<ActionAdd | ActionEdit>();
 
   let name = $state((props.action === 'edit' && props.name) || '');
-  let stock = $state<number>();
-  let maxOrder = $state<number>();
-  let roastedLevel = $state<number>();
-  let price = $state<number>();
-  let type = $state<string>();
+  let stock = ; // number
+  let maxOrder = ; // number
+  let roastedLevel = ; // number
+  let price = ; // number
+  let type = ; // string
   let open = $state<boolean>(false);
 
   async function submit(e: SubmitEvent) {
