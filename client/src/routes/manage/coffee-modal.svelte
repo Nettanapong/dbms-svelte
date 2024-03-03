@@ -2,6 +2,7 @@
   import { env } from '$env/dynamic/public';
   import { fade } from 'svelte/transition';
   import classes from 'svelte-transition-classes';
+    import { PUBLIC_BACKEND_URL } from '$env/static/public';
 
   type ActionAdd = {
     action: 'add';
@@ -23,11 +24,11 @@
   let { ...props } = $props<ActionAdd | ActionEdit>();
 
   let name = $state((props.action === 'edit' && props.name) || '');
-  let stock = 0;
-  let maxOrder = 0;
-  let roastedLevel = 0;
-  let price = 0;
-  let type = '';
+  let stock = $state((props.action === 'edit' && props.stock) || 0);
+  let maxOrder = $state((props.action === 'edit' && props.maxOrder) || 1);
+  let roastedLevel = $state((props.action === 'edit' && props.roastedLevel) || 0);
+  let price = $state((props.action === 'edit' && props.price) || 0);
+  let type = $state((props.action === 'edit' && props.type) || '');
   let open = $state<boolean>(false);
 
   $inspect(stock);
@@ -46,14 +47,50 @@
 
     switch (props.action) {
       case 'add': {
-        // send request to backend to add data
+        const res = await fetch(`${env.PUBLIC_BACKEND_URL}/coffee`, {
+          method: 'POST',
+          headers: {
+            'Content-Type' : 'application/json',
+          },
+          body: JSON.stringify({
+            name,
+            stock,
+            maxOrder,
+            roastedLevel,
+            price,
+            type,
+            open,
+        }),
+      }).catch((e) => console.error('Error: ', e));
+
+      if (!res) return;
+      if (!res.ok) return console.error('Failed to add coffee: ', await res.text());
+
         console.log('Coffee added successfully!');
         props.onAction();
         open = false;
         break;
       }
       case 'edit': {
-        // send request to backend to update data
+        const res = await fetch(`${env.PUBLIC_BACKEND_URL}/coffee/${props.id}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type' : 'application/json',
+          },
+          body: JSON.stringify({
+            name,
+            stock,
+            maxOrder,
+            roastedLevel,
+            price,
+            type,
+            open,
+          }),
+        }).catch((e) => console.error('Error: ', e));
+
+        if (!res) return;
+        if (!res.ok) return console.error('Failed to edit coffee: ', await res.text());
+
         console.log('Coffee editted successfully!');
         props.onAction();
         open = false;
